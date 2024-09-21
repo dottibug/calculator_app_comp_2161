@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Main Button Style -->
+    <style name="mainButtonStyle" parent="@style/Widget.Material3.Button.IconButton.Filled.Tonal">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">64dp</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Number Button Style -->
+    <style name="numberButtonStyle" parent="mainButtonStyle">
+        <item name="android:backgroundTint">@color/platinum</item>
+        <item name="android:textColor">@color/jet</item>
+    </style>
+
+    <!-- Number Button Style (Night Mode) -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Clear Button Style -->
+    <style name="clearButtonStyle" parent="mainButtonStyle">
+        <item name="android:backgroundTint">@color/platinum</item>
+        <item name="android:textColor">@color/poppy</item>
+    </style>
+
+    <!-- Clear Button Style (Night Mode) -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Operator Button Style -->
+    <style name="operatorStyle" parent="mainButtonStyle">
+        <item name="android:backgroundTint">@color/carolinaBlue</item>
+        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <!-- Operator Button Style (Night Mode) -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Equals Button Style -->
+    <style name="equalsStyle" parent="operatorStyle">
+        <item name="android:backgroundTint">@color/steelBlue</item>
+    </style>
+
+    <!-- Equals Button Style (Night Mode) -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Memory Button Style -->
+    <style name="memoryButtonStyle" parent="@style/Widget.Material3.Button.IconButton.Filled.Tonal">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:width">54dp</item>
+        <item name="android:height">54dp</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/jet</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:backgroundTint">@color/platinum</item>
+    </style>
+
+    <!-- Memory Button Style (Night Mode) -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Tools Button Style -->
+    <style name="toolsButtonStyle" parent="@style/Widget.Material3.Button.IconButton.Filled.Tonal">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:width">54dp</item>
+        <item name="android:height">54dp</item>
+        <item name="android:textColor">@color/jet</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:backgroundTint">@color/platinum</item>
+        <item name="iconGravity">textTop</item>
+    </style>
+
+    <!-- Tools Button Style -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Divider -->
+    <style name="dividerStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/slateGray</item>
+    </style>
+
+
+</resources>

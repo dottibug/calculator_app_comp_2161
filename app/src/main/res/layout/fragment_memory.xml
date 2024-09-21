@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/seasalt"
+        tools:context=".MemoryFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutMemoryButtons"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp">
+
+            <Button
+                android:id="@+id/buttonMemoryClear"
+                style="@style/memoryButtonStyle"
+                android:text="@string/memory_clear"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonMemoryStore"
+                app:layout_constraintEnd_toStartOf="@+id/buttonMemoryStore"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/buttonMemoryStore" />
+
+            <Button
+                android:id="@+id/buttonMemoryStore"
+                style="@style/memoryButtonStyle"
+                android:text="@string/memory_store"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonMemoryRecall"
+                app:layout_constraintEnd_toStartOf="@+id/buttonMemoryRecall"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonMemoryClear"
+                app:layout_constraintTop_toTopOf="@+id/buttonMemoryRecall" />
+
+            <Button
+                android:id="@+id/buttonMemoryRecall"
+                style="@style/memoryButtonStyle"
+                android:text="@string/memory_recall"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonMemoryAdd"
+                app:layout_constraintEnd_toStartOf="@+id/buttonMemoryAdd"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonMemoryStore"
+                app:layout_constraintTop_toTopOf="@+id/buttonMemoryAdd" />
+
+            <Button
+                android:id="@+id/buttonMemoryAdd"
+                style="@style/memoryButtonStyle"
+                android:text="@string/memory_add"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonMemorySubtract"
+                app:layout_constraintEnd_toStartOf="@+id/buttonMemorySubtract"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonMemoryRecall"
+                app:layout_constraintTop_toTopOf="@+id/buttonMemorySubtract" />
+
+            <Button
+                android:id="@+id/buttonMemorySubtract"
+                style="@style/memoryButtonStyle"
+                android:text="@string/memory_subtract"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonMemoryAdd"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/divider"
+            style="@style/dividerStyle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutMemoryButtons" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

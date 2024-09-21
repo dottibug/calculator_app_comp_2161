@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="jet">#2D2D2D</color>
+    <color name="seasalt">#FAFAFA</color>
+    <color name="platinum">#E0E0E0</color>
+    <color name="poppy">#D13E3E</color>
+    <color name="slateGray">#80909D</color>
+    <color name="steelBlue">#4489BD</color>
+    <color name="carolinaBlue">#8BAFCB</color>
+</resources>

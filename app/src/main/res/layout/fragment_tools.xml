@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/seasalt"
+        tools:context=".ToolsFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutToolButtons"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            tools:layout_editor_absoluteX="18dp">
+
+            <Button
+                android:id="@+id/buttonSettings"
+                style="@style/toolsButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/settings_button"
+                app:icon="@drawable/settings_jet"
+                app:iconSize="24dp"
+                app:iconTint="@color/jet"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/buttonDarkMode"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/buttonDarkMode"
+                style="@style/toolsButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/dark_mode_button"
+                app:icon="@drawable/darkmode_jet"
+                app:iconSize="24dp"
+                app:iconTint="@color/jet"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonSettings"
+                app:layout_constraintEnd_toStartOf="@+id/buttonCalculatorMode"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonSettings"
+                app:layout_constraintTop_toTopOf="@+id/buttonSettings" />
+
+            <Button
+                android:id="@+id/buttonCalculatorMode"
+                style="@style/toolsButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/scientific_mode_button"
+                app:icon="@drawable/scientific_jet"
+                app:iconSize="24dp"
+                app:iconTint="@color/jet"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonDarkMode"
+                app:layout_constraintEnd_toStartOf="@+id/buttonConversion"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonDarkMode"
+                app:layout_constraintTop_toTopOf="@+id/buttonDarkMode" />
+
+            <Button
+                android:id="@+id/buttonConversion"
+                style="@style/toolsButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/conversion_button"
+                app:icon="@drawable/convert_jet"
+                app:iconSize="24dp"
+                app:iconTint="@color/jet"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonCalculatorMode"
+                app:layout_constraintEnd_toStartOf="@+id/buttonBackspace"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonCalculatorMode"
+                app:layout_constraintTop_toTopOf="@+id/buttonCalculatorMode" />
+
+            <Button
+                android:id="@+id/buttonBackspace"
+                style="@style/toolsButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/backspace_button"
+                android:paddingTop="11dp"
+                android:paddingRight="12dp"
+                app:icon="@drawable/backspace_jet"
+                app:iconSize="24dp"
+                app:iconTint="@color/poppy"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonConversion"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/buttonConversion"
+                app:layout_constraintTop_toTopOf="@+id/buttonConversion" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/divider2"
+            style="@style/dividerStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutToolButtons" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

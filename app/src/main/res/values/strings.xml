@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">Calculator</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Display -->
+    <string name="running_equation">3 + 2 + 5</string>
+    <string name="result">10</string>
+
+    <!-- Tools -->
+    <string name="settings_button">Settings</string>
+    <string name="dark_mode_button">Dark Mode</string>
+    <string name="scientific_mode_button">Scientific Mode</string>
+    <string name="basic_mode_button">Basic Mode</string>
+    <string name="conversion_button">Conversion</string>
+    <string name="backspace_button">Backspace</string>
+
+    <!-- Memory -->
+    <string name="memory_clear">MC</string>
+    <string name="memory_store">MS</string>
+    <string name="memory_recall">MR</string>
+    <string name="memory_add">M+</string>
+    <string name="memory_subtract">M-</string>
+
+    <!-- Numbers -->
+    <string name="n0">0</string>
+    <string name="n1">1</string>
+    <string name="n2">2</string>
+    <string name="n3">3</string>
+    <string name="n4">4</string>
+    <string name="n5">5</string>
+    <string name="n6">6</string>
+    <string name="n7">7</string>
+    <string name="n8">8</string>
+    <string name="n9">9</string>
+    <string name="decimal">.</string>
+    <string name="sign">+/-</string>
+    <string name="percent">%</string>
+    <string name="clear">C</string>
+    <string name="brackets">( )</string>
+
+    <!-- Operators -->
+    <string name="divide">&#xf7;</string>
+    <string name="multiply">&#xd7;</string>
+    <string name="subtract">&#x2212;</string>
+    <string name="add">&#x2b;</string>
+    <string name="equals">&#x3d;</string>
+
+</resources>
