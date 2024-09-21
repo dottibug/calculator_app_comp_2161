@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.calculator.databinding.FragmentNumberPadBinding
+import android.util.Log
 
 class NumberPadFragment : Fragment() {
 
