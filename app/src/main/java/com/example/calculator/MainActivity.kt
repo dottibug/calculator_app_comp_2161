@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.calculator.databinding.ActivityMainBinding
 
+//
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -27,5 +28,27 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    // Equals button click handler
+    fun onEqualsClick() {
+        // Get the DisplayFragment and call its updateEquation method
+        val displayFragment = supportFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
+        // TODO
+    }
+
+
+    // Called when a number button is clicked
+   fun onNumberClick(number: String) {
+        // Get the DisplayFragment and call its updateEquation method
+        val displayFragment = supportFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
+        displayFragment.updateEquation(number)
+    }
+
+    // Called when an operator button is clicked
+    fun onOperatorClick(operator: String) {
+        // Get the DisplayFragment and call its updateEquation method
+        val displayFragment = supportFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
+        displayFragment.updateEquation(operator)
     }
 }

@@ -16,7 +16,7 @@
         tools:context=".MainActivity">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerDisplay"
+            android:id="@+id/displayFragment"
             android:name="com.example.calculator.DisplayFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"

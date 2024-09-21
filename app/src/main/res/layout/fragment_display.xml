@@ -4,9 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable
-            name="viewModel"
-            type="com.example.calculator.CalculatorViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,9 +20,7 @@
             android:id="@+id/textViewEquation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
-            android:hint="@string/running_equation"
-            android:text="@{viewModel.equation}"
+            android:text="@string/running_equation"
             android:textAlignment="viewEnd"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
