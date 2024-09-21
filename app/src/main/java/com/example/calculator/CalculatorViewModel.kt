@@ -21,8 +21,8 @@ class CalculatorViewModel : ViewModel() {
 
     // Update equation
     fun onNumberClicked(number: String) {
-        Log.i("testcat", "Number 5 clicked: Calculator ViewModel")
         _equation.value += number
+        Log.i("testcat", "equation value: ${_equation.value}")
     }
 
     // Update result

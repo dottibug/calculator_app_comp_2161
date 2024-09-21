@@ -20,9 +20,11 @@
         tools:context=".DisplayFragment">
 
         <TextView
-            android:id="@+id/equation"
+            android:id="@+id/textViewEquation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+
+            android:hint="@string/running_equation"
             android:text="@{viewModel.equation}"
             android:textAlignment="viewEnd"
             android:textSize="24sp"
@@ -42,7 +44,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/equation"
+            app:layout_constraintTop_toBottomOf="@+id/textViewEquation"
             app:layout_constraintVertical_bias="0.58000004" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
