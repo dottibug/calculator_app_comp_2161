@@ -1,5 +1,6 @@
 package com.example.calculator
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +20,9 @@ class CalculatorViewModel : ViewModel() {
     // METHODS -----------------------------------------------------------------
 
     // Update equation
-    fun updateEquation(equation: String) {
-        _equation.value = equation
+    fun onNumberClicked(number: String) {
+        Log.i("testcat", "Number 5 clicked: Calculator ViewModel")
+        _equation.value += number
     }
 
     // Update result

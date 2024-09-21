@@ -1,6 +1,7 @@
 package com.example.calculator
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,16 @@ class NumberPadFragment : Fragment() {
     ): View {
         // Inflate the dataBinding layout for this fragment
         binding = FragmentNumberPadBinding.inflate(inflater, container, false)
+
+        createNumberClickListeners()
+
         return binding.root
+    }
+
+    private fun createNumberClickListeners() {
+        Log.i("testcat", "Number 5 clicked: NumberPad Fragment")
+        binding.button5.setOnClickListener {
+            viewModel.onNumberClicked("5")
+        }
     }
 }
