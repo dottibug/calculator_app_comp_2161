@@ -11,14 +11,13 @@ import com.example.calculator.databinding.FragmentNumberPadBinding
 class NumberPadFragment : Fragment() {
 
     private lateinit var binding: FragmentNumberPadBinding
+    private val viewModel: CalculatorViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the dataBinding layout for this fragment
-        val viewModel: CalculatorViewModel by viewModels()
-
         binding = FragmentNumberPadBinding.inflate(inflater, container, false)
         return binding.root
     }
