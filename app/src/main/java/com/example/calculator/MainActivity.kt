@@ -34,6 +34,13 @@ class MainActivity : AppCompatActivity() {
         displayFragment = supportFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
     }
 
+    // Clear button click handler
+    fun onClearClick() {
+        displayFragment.clearDisplay()
+        numberInput = ""
+        operatorClicked = false
+    }
+
     // Equals button click handler
     fun onEqualsClick() {
         // TODO

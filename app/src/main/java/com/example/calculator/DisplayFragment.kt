@@ -35,19 +35,26 @@ class DisplayFragment : Fragment() {
         return equation.text.toString()
     }
 
-    // TODO need to show the intermediate results of the calculation
     fun updateEquation(input: String) {
         // Append the input to the equation
-        val currentEquation = binding.textViewEquation.text.toString()
-        binding.textViewEquation.text = currentEquation + input
+        val currentEquation = equation.text.toString()
+        equation.text = currentEquation + input
+    }
+
+    fun clearDisplay() {
+        clearEquation()
+        clearResult()
+    }
+
+    fun clearEquation() {
+        equation.text = ""
     }
 
     fun clearResult() {
-        binding.result.text = ""
+        result.text = ""
     }
 
-    fun updateResult(result: String) {
-        binding.result.text = result
+    fun updateResult(newResult: String) {
+        result.text = newResult
     }
-
 }
