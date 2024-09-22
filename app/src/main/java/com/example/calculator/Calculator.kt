@@ -24,7 +24,7 @@ class Calculator
             // NOTE: × is not the letter x, it is the multiplication symbol
             when (operators[i]) {
                 "+" -> result += numbers[i+1].toInt()
-                "-" -> result -= numbers[i+1].toInt()
+                "~" -> result -= numbers[i+1].toInt()
                 "×" -> result *= numbers[i+1].toInt()
                 "÷" -> result /= numbers[i+1].toInt()
             }
@@ -66,11 +66,12 @@ class Calculator
     // Get a mutable list of numbers from the equation string
     private fun getNumbersList(equation: String) : MutableList<String> {
         // NOTE: × is not the letter x, it is the multiplication symbol
-        return equation.split("+", "-", "×", "÷").toMutableList()
+        // NOTE: ~ is used to represent subtraction and allow for easy parsing of minus vs negative
+        return equation.split("+", "~", "×", "÷").toMutableList()
     }
 
     // Get a mutable list of operators from the equation string
     private fun getOperatorsList(equation: String) : MutableList<String> {
-        return equation.split(Regex("\\d+")).filter { it.isNotEmpty() }.toMutableList()
+        return equation.split(Regex("-?\\d+")).filter { it.isNotEmpty() }.toMutableList()
     }
 }

@@ -37,10 +37,14 @@ class NumberPadFragment : Fragment() {
             activity.onOperatorClick("÷")
         }
         binding.buttonMultiply.setOnClickListener {
+            // NOTE: × is not the letter x, it is the multiplication symbol
             activity.onOperatorClick("×")
         }
         binding.buttonSubtract.setOnClickListener {
-            activity.onOperatorClick("-")
+            // activity.onOperatorClick("−")
+            // NOTE: the ~ tilde symbol is used to represent subtraction and allow for easy
+            //  parsing of minus vs negative numbers from the equation string
+            activity.onOperatorClick("~")
         }
         binding.buttonAdd.setOnClickListener {
             activity.onOperatorClick("+")

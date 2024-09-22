@@ -40,10 +40,12 @@
     <string name="brackets">( )</string>
 
     <!-- Operators -->
-    <string name="divide">&#xf7;</string>
-    <string name="multiply">&#xd7;</string>
-    <string name="subtract">&#x2212;</string>
-    <string name="add">&#x2b;</string>
-    <string name="equals">&#x3d;</string>
+    <!-- ( − ) is the mathematical minus sign, not the hyphen symbol -->
+    <!-- ( × ) is not the letter x, it is the multiplication symbol -->
+    <string name="divide">÷</string>
+    <string name="multiply">×</string>
+    <string name="subtract">−</string>
+    <string name="add">+</string>
+    <string name="equals">=</string>
 
 </resources>

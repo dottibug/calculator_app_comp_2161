@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private var numberInput : String = ""
     private var equalsClicked : Boolean = false
     private var finalResult : String = ""
+    private var currentEquation : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,22 +46,13 @@ class MainActivity : AppCompatActivity() {
 
     // Equals button click handler
     fun onEqualsClick() {
-        // TEST
         // note: after clicking equals, the equation should be cleared and only the result show
-        finalResult = calculateResult()
-        displayFragment.clearEquation()
-        displayFragment.updateResult(finalResult)
         equalsClicked = true
         operatorClicked = false
         numberInput = ""
-
-
-        // note: if a user clicks equals and then clicks another operator, the result should
-        //  become the first number in the new equation and the old equation should be cleared
-//        equalsClicked = true
-//        val result = calculateResult()
-//        displayFragment.updateResult(result)
-//        operatorClicked = false // Reset operatorClicked after calculation
+        finalResult = calculateResult()
+        displayFragment.updateResult(finalResult)
+        displayFragment.clearEquation()
     }
 
     // Number button click handler
@@ -72,11 +64,13 @@ class MainActivity : AppCompatActivity() {
 
         if (equalsClicked) {
             displayFragment.clearEquation()
-            displayFragment.updateEquation(numberInput)
+            updateEquation(numberInput)
+            displayFragment.displayEquation(currentEquation)
             displayFragment.clearResult()
             equalsClicked = false
         } else {
-            displayFragment.updateEquation(number)
+            updateEquation(number)
+            displayFragment.displayEquation(currentEquation)
         }
 
         if (operatorClicked) {
@@ -85,20 +79,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Update the equation string
+    private fun updateEquation(input: String) {
+        currentEquation = "$currentEquation$input"
+    }
+
     // Operator button click handler
     fun onOperatorClick(operator: String) {
         // note: if equalsClicked is TRUE, the finalResult should become the first number in the
         //  new equation, with the operator appended to it; final result should be cleared
         if (equalsClicked) {
             operatorClicked = true
-            displayFragment.updateEquation("$finalResult$operator")
+            currentEquation = "$finalResult$operator"
+            displayFragment.displayEquation(currentEquation)
             displayFragment.clearResult()
             equalsClicked = false
             // Exit the function after setting equalsClicked to false or the else block will run
             return
         } else {
             displayFragment.clearResult()
-            displayFragment.updateEquation(operator)
+            updateEquation(operator)
+            displayFragment.displayEquation(currentEquation)
             operatorClicked = true
             equalsClicked = false
         }
@@ -106,9 +107,8 @@ class MainActivity : AppCompatActivity() {
 
     // Calculate the result of the equation
     private fun calculateResult() : String {
-        val equation = displayFragment.getEquation()
         val calculator = Calculator()
-        return calculator.calculate(equation)
+        return calculator.calculate(currentEquation)
     }
 }
 

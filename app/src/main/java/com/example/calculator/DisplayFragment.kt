@@ -12,8 +12,8 @@ import com.example.calculator.databinding.FragmentDisplayBinding
 class DisplayFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayBinding
-    lateinit var equation: TextView
-    lateinit var result: TextView
+    private lateinit var equation: TextView
+    private lateinit var result: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,10 +35,10 @@ class DisplayFragment : Fragment() {
         return equation.text.toString()
     }
 
-    fun updateEquation(input: String) {
-        // Append the input to the equation
-        val currentEquation = equation.text.toString()
-        equation.text = currentEquation + input
+    fun displayEquation(newEquation: String) {
+        // Replaces ~ in equation string with - in the UI
+        val updatedEquation = newEquation.replace("~", "-")
+        equation.text = updatedEquation
     }
 
     fun clearDisplay() {
