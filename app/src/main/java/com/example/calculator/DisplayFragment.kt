@@ -13,6 +13,7 @@ class DisplayFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayBinding
     lateinit var equation: TextView
+    lateinit var result: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +28,11 @@ class DisplayFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         // Initialize the equation
         equation = binding.textViewEquation
+        result = binding.result
+    }
+
+    fun getEquation() : String {
+        return equation.text.toString()
     }
 
     // TODO need to show the intermediate results of the calculation
@@ -39,4 +45,9 @@ class DisplayFragment : Fragment() {
     fun clearResult() {
         binding.result.text = ""
     }
+
+    fun updateResult(result: String) {
+        binding.result.text = result
+    }
+
 }
