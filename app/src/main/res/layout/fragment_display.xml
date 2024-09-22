@@ -17,6 +17,19 @@
         tools:context=".DisplayFragment">
 
         <TextView
+            android:id="@+id/textViewResult"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/result"
+            android:textAlignment="viewEnd"
+            android:textSize="60sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
             android:id="@+id/textViewEquation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -26,20 +39,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewResult"
+            app:layout_constraintVertical_bias="0.6" />
 
-        <TextView
-            android:id="@+id/result"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/result"
-            android:textAlignment="viewEnd"
-            android:textSize="60sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewEquation"
-            app:layout_constraintVertical_bias="0.58000004" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

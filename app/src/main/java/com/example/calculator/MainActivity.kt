@@ -42,13 +42,16 @@ class MainActivity : AppCompatActivity() {
     fun onClearClick() {
         displayFragment.clearDisplay()
         numberInput = ""
+        currentEquation = ""
+        finalResult = ""
+        equalsClicked = false
         operatorClicked = false
     }
 
     // Equals button click handler
     fun onEqualsClick() {
 
-        if (currentEquation.isEmpty()) {
+        if (currentEquation.isEmpty() && finalResult.isEmpty()) {
             showToast("Invalid equation")
             return
         }
@@ -59,7 +62,8 @@ class MainActivity : AppCompatActivity() {
         numberInput = ""
         finalResult = calculateResult()
         displayFragment.updateResult(finalResult)
-        displayFragment.clearEquation()
+        currentEquation = ""
+        displayFragment.displayEquation(currentEquation)
     }
 
     // Number button click handler
@@ -70,7 +74,8 @@ class MainActivity : AppCompatActivity() {
         numberInput += number
 
         if (equalsClicked) {
-            displayFragment.clearEquation()
+            currentEquation = ""
+            displayFragment.displayEquation(currentEquation)
             updateEquation(numberInput)
             displayFragment.displayEquation(currentEquation)
             displayFragment.clearResult()
@@ -93,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
     // Operator button click handler
     fun onOperatorClick(operator: String) {
-        if (currentEquation.isEmpty()) {
+        if (currentEquation.isEmpty() && finalResult.isEmpty()) {
             showToast("Invalid equation")
             return
         }

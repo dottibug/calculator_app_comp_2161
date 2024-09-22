@@ -28,7 +28,7 @@ class DisplayFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         // Initialize the equation
         equation = binding.textViewEquation
-        result = binding.result
+        result = binding.textViewResult
     }
 
     fun getEquation() : String {

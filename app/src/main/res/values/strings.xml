@@ -5,7 +5,7 @@
 
     <!-- Display -->
     <string name="running_equation"></string>
-    <string name="result">10</string>
+    <string name="result"></string>
 
     <!-- Tools -->
     <string name="settings_button">Settings</string>
