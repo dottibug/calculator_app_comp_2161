@@ -1,6 +1,7 @@
 package com.example.calculator
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -46,6 +47,12 @@ class MainActivity : AppCompatActivity() {
 
     // Equals button click handler
     fun onEqualsClick() {
+
+        if (currentEquation.isEmpty()) {
+            showToast("Invalid equation")
+            return
+        }
+
         // note: after clicking equals, the equation should be cleared and only the result show
         equalsClicked = true
         operatorClicked = false
@@ -86,6 +93,11 @@ class MainActivity : AppCompatActivity() {
 
     // Operator button click handler
     fun onOperatorClick(operator: String) {
+        if (currentEquation.isEmpty()) {
+            showToast("Invalid equation")
+            return
+        }
+
         // note: if equalsClicked is TRUE, the finalResult should become the first number in the
         //  new equation, with the operator appended to it; final result should be cleared
         if (equalsClicked) {
@@ -109,6 +121,10 @@ class MainActivity : AppCompatActivity() {
     private fun calculateResult() : String {
         val calculator = Calculator()
         return calculator.calculate(currentEquation)
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
 
