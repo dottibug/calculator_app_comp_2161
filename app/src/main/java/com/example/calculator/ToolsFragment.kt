@@ -17,6 +17,13 @@ class ToolsFragment : Fragment() {
     ): View {
         // Inflate the dataBinding layout for this fragment
         binding = FragmentToolsBinding.inflate(inflater, container, false)
+
+        // Get the parent activity
+        val activity = requireActivity() as MainActivity
+
+        // Create click listeners
+        binding.buttonBackspace.setOnClickListener { activity.onBackspaceClick() }
+
         return binding.root
     }
 }

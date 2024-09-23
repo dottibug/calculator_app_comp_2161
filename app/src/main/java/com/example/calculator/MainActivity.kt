@@ -149,5 +149,23 @@ class MainActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+
+    fun onBackspaceClick() {
+        // get the cursor position and the current equation
+        // if the cursor is at the beginning of the equation, do nothing
+        // else, delete the character at the cursor position
+        val cursorPosition = displayFragment.getCursorPosition()
+        if (cursorPosition == 0) {
+            return
+        } else {
+            // Delete the character at the cursor position
+            val leftOfCursor = currentEquation.substring(0, cursorPosition - 1)
+            val rightOfCursor = currentEquation.substring(cursorPosition)
+            currentEquation = "$leftOfCursor$rightOfCursor"
+            displayFragment.displayEquation(currentEquation)
+            val newCursorPosition = cursorPosition - 1
+            displayFragment.setCursorPosition(newCursorPosition)
+        }
+    }
 }
 
