@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.calculator.databinding.FragmentDisplayBinding
@@ -12,7 +13,7 @@ import com.example.calculator.databinding.FragmentDisplayBinding
 class DisplayFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayBinding
-    private lateinit var equation: TextView
+     lateinit var equation: EditText
     private lateinit var result: TextView
 
     override fun onCreateView(
@@ -27,8 +28,14 @@ class DisplayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Initialize the equation
-        equation = binding.textViewEquation
+        equation = binding.editViewEquation
         result = binding.textViewResult
+
+        // Disable keyboard input
+        equation.showSoftInputOnFocus = false
+
+        // Set the cursor to the end of the equation
+        equation.requestFocus()
     }
 
     fun getEquation() : String {
@@ -38,7 +45,8 @@ class DisplayFragment : Fragment() {
     fun displayEquation(newEquation: String) {
         // Replaces ~ in equation string with - in the UI
         val updatedEquation = newEquation.replace("~", "-")
-        equation.text = updatedEquation
+        equation.setText(updatedEquation)
+        equation.setSelection(updatedEquation.length)
     }
 
     fun clearDisplay() {
@@ -46,8 +54,8 @@ class DisplayFragment : Fragment() {
         clearResult()
     }
 
-    fun clearEquation() {
-        equation.text = ""
+    private fun clearEquation() {
+        equation.setText("")
     }
 
     fun clearResult() {
@@ -56,5 +64,15 @@ class DisplayFragment : Fragment() {
 
     fun updateResult(newResult: String) {
         result.text = newResult
+    }
+
+    fun getCursorPosition() : Int {
+        return equation.selectionStart
+    }
+
+    fun setCursorPosition(position: Int) {
+        if (equation.text.isNotEmpty()) {
+            equation.setSelection(position)
+        }
     }
 }

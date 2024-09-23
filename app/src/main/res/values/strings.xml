@@ -4,7 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Display -->
-    <string name="running_equation"></string>
+    <string name="equation">Enter an equation</string>
     <string name="result"></string>
 
     <!-- Tools -->

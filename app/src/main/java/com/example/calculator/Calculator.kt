@@ -1,11 +1,22 @@
 package com.example.calculator
 
+import android.content.Context
+import android.widget.Toast
+
 class Calculator
 {
-    fun calculate(equation: String) : String {
+    fun calculate(context: Context, equation: String) : String {
         // Split the equation string into mutable arrays of numbers and operators
         val numbers = getNumbersList(equation)
         val operators = getOperatorsList(equation)
+
+        // Check that the number of operators is one less than the number of numbers
+        // If it is not, the equation is invalid (too many operators)
+        // TODO when brackets are implemented, you will have to consider equations such as 1-(+12)
+        if (operators.size != (numbers.size - 1)) {
+            Toast.makeText(context, "Invalid equation", Toast.LENGTH_SHORT).show()
+            return ""
+        }
 
         // BEDMAS Order of operations
         // TODO need to handle brackets

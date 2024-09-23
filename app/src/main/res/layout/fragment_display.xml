@@ -9,10 +9,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/design_default_color_secondary"
-        android:paddingStart="18dp"
+        android:background="@color/seasalt"
         android:paddingTop="18dp"
-        android:paddingEnd="18dp"
         android:paddingBottom="18dp"
         tools:context=".DisplayFragment">
 
@@ -20,6 +18,8 @@
             android:id="@+id/textViewResult"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:text="@string/result"
             android:textAlignment="viewEnd"
             android:textSize="60sp"
@@ -29,12 +29,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
-        <TextView
-            android:id="@+id/textViewEquation"
+        <EditText
+            android:id="@+id/editViewEquation"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/running_equation"
-            android:textAlignment="viewEnd"
+            android:layout_height="48dp"
+            android:autofillHints="no"
+            android:background="@null"
+            android:cursorVisible="true"
+            android:gravity="end"
+            android:inputType="text"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -42,5 +47,16 @@
             app:layout_constraintTop_toBottomOf="@+id/textViewResult"
             app:layout_constraintVertical_bias="0.6" />
 
+        <View
+            android:id="@+id/divider"
+            style="@style/dividerStyle"
+            android:layout_width="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editViewEquation" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

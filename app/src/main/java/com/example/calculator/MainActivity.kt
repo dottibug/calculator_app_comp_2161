@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var operatorClicked : Boolean = false
     private lateinit var displayFragment: DisplayFragment
-    private var numberInput : String = ""
     private var equalsClicked : Boolean = false
     private var finalResult : String = ""
     private var currentEquation : String = ""
@@ -41,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     // Clear button click handler
     fun onClearClick() {
         displayFragment.clearDisplay()
-        numberInput = ""
         currentEquation = ""
         finalResult = ""
         equalsClicked = false
@@ -51,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     // Equals button click handler
     fun onEqualsClick() {
 
-        if (currentEquation.isEmpty() && finalResult.isEmpty()) {
+        if (currentEquation.isEmpty()) {
             showToast("Invalid equation")
             return
         }
@@ -59,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         // note: after clicking equals, the equation should be cleared and only the result show
         equalsClicked = true
         operatorClicked = false
-        numberInput = ""
         finalResult = calculateResult()
         displayFragment.updateResult(finalResult)
         currentEquation = ""
@@ -68,21 +65,26 @@ class MainActivity : AppCompatActivity() {
 
     // Number button click handler
     fun onNumberClick(number: String) {
+
+        val cursorPosition = displayFragment.getCursorPosition()
+        val leftOfCursor = currentEquation.substring(0, cursorPosition)
+        val rightOfCursor = currentEquation.substring(cursorPosition)
+
+        currentEquation = "$leftOfCursor$number$rightOfCursor"
+
         // note: if equalsClicked is TRUE and a user clicks a number, that number should become
         //  the first number in the new equation and the result should be cleared
-
-        numberInput += number
-
         if (equalsClicked) {
             currentEquation = ""
             displayFragment.displayEquation(currentEquation)
-            updateEquation(numberInput)
+            updateEquation(number)
             displayFragment.displayEquation(currentEquation)
             displayFragment.clearResult()
             equalsClicked = false
         } else {
-            updateEquation(number)
             displayFragment.displayEquation(currentEquation)
+            val newCursorPosition = cursorPosition + 1
+            displayFragment.setCursorPosition(newCursorPosition)
         }
 
         if (operatorClicked) {
@@ -115,8 +117,24 @@ class MainActivity : AppCompatActivity() {
             return
         } else {
             displayFragment.clearResult()
-            updateEquation(operator)
+
+            val cursorPosition = displayFragment.getCursorPosition()
+            val leftOfCursor = currentEquation.substring(0, cursorPosition)
+            val rightOfCursor = currentEquation.substring(cursorPosition)
+
+            currentEquation = "$leftOfCursor$operator$rightOfCursor"
             displayFragment.displayEquation(currentEquation)
+
+            val newCursorPosition = cursorPosition + 1
+            displayFragment.setCursorPosition(newCursorPosition)
+
+            // if newCursorPosition is < currentEquation.length, the operator was potentially added between
+            // two numbers and should be calculated
+            if (newCursorPosition < currentEquation.length) {
+                val result = calculateResult()
+                displayFragment.updateResult(result)
+            }
+
             operatorClicked = true
             equalsClicked = false
         }
@@ -125,7 +143,7 @@ class MainActivity : AppCompatActivity() {
     // Calculate the result of the equation
     private fun calculateResult() : String {
         val calculator = Calculator()
-        return calculator.calculate(currentEquation)
+        return calculator.calculate(this, currentEquation)
     }
 
     private fun showToast(message: String) {
