@@ -15,7 +15,7 @@ class Calculator
         // TODO when brackets are implemented, you will have to consider equations such as 1-(+12)
         if (operators.size != (numbers.size - 1)) {
             Toast.makeText(context, "Invalid equation", Toast.LENGTH_SHORT).show()
-            return ""
+            return "error"
         }
 
         // BEDMAS Order of operations

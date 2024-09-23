@@ -13,7 +13,7 @@ import com.example.calculator.databinding.FragmentDisplayBinding
 class DisplayFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayBinding
-     lateinit var equation: EditText
+     private lateinit var equation: EditText
     private lateinit var result: TextView
 
     override fun onCreateView(

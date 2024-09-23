@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     // Equals button click handler
     fun onEqualsClick() {
-        if (currentEquation.isEmpty()) {
+        if (currentEquation.isEmpty() || currentEquation.last() == '+' || currentEquation.last() == '~' || currentEquation.last() == '×' || currentEquation.last() == '÷') {
             showToast("Invalid equation")
             return
         }
@@ -118,24 +118,38 @@ class MainActivity : AppCompatActivity() {
             displayFragment.clearResult()
 
             val cursorPosition = displayFragment.getCursorPosition()
-            val leftOfCursor = currentEquation.substring(0, cursorPosition)
-            val rightOfCursor = currentEquation.substring(cursorPosition)
 
-            currentEquation = "$leftOfCursor$operator$rightOfCursor"
-            displayFragment.displayEquation(currentEquation)
-
-            val newCursorPosition = cursorPosition + 1
-            displayFragment.setCursorPosition(newCursorPosition)
-
-            // if newCursorPosition is < currentEquation.length, the operator was potentially added between
-            // two numbers and should be calculated
-            if (newCursorPosition < currentEquation.length) {
-                val result = calculateResult()
-                displayFragment.updateResult(result)
+            // if cursor is at the end of the equation, change the previous character to the new operator
+            val lastChar = currentEquation.last()
+            if (cursorPosition == currentEquation.length && (lastChar == '+' || lastChar == '~' || lastChar == '×' || lastChar == '÷')) {
+                val newEquation = currentEquation.replace(lastChar.toString(), operator)
+                currentEquation = newEquation
+                displayFragment.displayEquation(currentEquation)
+                operatorClicked = true
+                equalsClicked = false
+                return
             }
 
-            operatorClicked = true
-            equalsClicked = false
+            else {
+                val leftOfCursor = currentEquation.substring(0, cursorPosition)
+                val rightOfCursor = currentEquation.substring(cursorPosition)
+
+                currentEquation = "$leftOfCursor$operator$rightOfCursor"
+                displayFragment.displayEquation(currentEquation)
+
+                val newCursorPosition = cursorPosition + 1
+                displayFragment.setCursorPosition(newCursorPosition)
+
+                // if newCursorPosition is < currentEquation.length, the operator was potentially added between
+                // two numbers and should be calculated
+                if (newCursorPosition < currentEquation.length) {
+                    val result = calculateResult()
+                    displayFragment.updateResult(result)
+                }
+
+                operatorClicked = true
+                equalsClicked = false
+            }
         }
     }
 
