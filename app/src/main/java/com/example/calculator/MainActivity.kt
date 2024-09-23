@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity() {
 
     // Equals button click handler
     fun onEqualsClick() {
-
         if (currentEquation.isEmpty()) {
             showToast("Invalid equation")
             return
@@ -56,11 +55,11 @@ class MainActivity : AppCompatActivity() {
 
         // note: after clicking equals, the equation should be cleared and only the result show
         equalsClicked = true
-        operatorClicked = false
         finalResult = calculateResult()
         displayFragment.updateResult(finalResult)
         currentEquation = ""
         displayFragment.displayEquation(currentEquation)
+        operatorClicked = false
     }
 
     // Number button click handler
