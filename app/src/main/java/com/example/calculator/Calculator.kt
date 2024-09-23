@@ -78,11 +78,14 @@ class Calculator
     private fun getNumbersList(equation: String) : MutableList<String> {
         // NOTE: × is not the letter x, it is the multiplication symbol
         // NOTE: ~ is used to represent subtraction and allow for easy parsing of minus vs negative
-        return equation.split("+", "~", "×", "÷").toMutableList()
+        return equation.split("+", "~", "×", "÷").filter { it.isNotEmpty() }.toMutableList()
     }
 
     // Get a mutable list of operators from the equation string
     private fun getOperatorsList(equation: String) : MutableList<String> {
-        return equation.split(Regex("-?\\d+")).filter { it.isNotEmpty() }.toMutableList()
+        // Find all operators in the equation, map them to a list, and return the list
+        // it.value is the value of the match (an operator)
+        val regex = Regex("[+~×÷]")
+        return regex.findAll(equation).map { it.value }.toMutableList()
     }
 }

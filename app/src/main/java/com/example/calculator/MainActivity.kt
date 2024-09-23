@@ -116,7 +116,6 @@ class MainActivity : AppCompatActivity() {
             return
         } else {
             displayFragment.clearResult()
-
             val cursorPosition = displayFragment.getCursorPosition()
 
             // if cursor is at the end of the equation, change the previous character to the new operator
@@ -156,6 +155,7 @@ class MainActivity : AppCompatActivity() {
     // Calculate the result of the equation
     private fun calculateResult() : String {
         val calculator = Calculator()
+        // todo if return is error, then show a toast (to take the toast out of the calculator class)
         return calculator.calculate(this, currentEquation)
     }
 
@@ -178,6 +178,7 @@ class MainActivity : AppCompatActivity() {
             displayFragment.displayEquation(currentEquation)
             val newCursorPosition = cursorPosition - 1
             displayFragment.setCursorPosition(newCursorPosition)
+            calculateResult()
         }
     }
 }
