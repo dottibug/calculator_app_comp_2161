@@ -378,7 +378,7 @@ class MainActivity : AppCompatActivity() {
 
         // If equation is empty -> (-
         if (currentEquation.isEmpty()) {
-            currentEquation = "-("
+            currentEquation = "(-"
             displayFragment.displayEquation(currentEquation)
             val newCursorPosition = 2
             displayFragment.setCursorPosition(newCursorPosition)
