@@ -135,6 +135,11 @@ class MainActivity : AppCompatActivity() {
                 val leftOfCursor = currentEquation.substring(0, cursorPosition)
                 val rightOfCursor = currentEquation.substring(cursorPosition)
 
+                // Prevent user from entering an operator to the left of an opening bracket
+                if (leftOfCursor.isNotEmpty() && leftOfCursor.first() == '(') {
+                    return
+                }
+
                 currentEquation = "$leftOfCursor$operator$rightOfCursor"
                 displayFragment.displayEquation(currentEquation)
 
