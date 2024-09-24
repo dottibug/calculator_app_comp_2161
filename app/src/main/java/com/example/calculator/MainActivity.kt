@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private var finalResult : String = ""
     private var currentEquation : String = ""
     private var openBracketClicked : Boolean = false
+    private var userSettingsDecimalPlaces : String = "10" // default to 10 decimal places
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,13 +167,13 @@ class MainActivity : AppCompatActivity() {
                 val missingBrackets = openBrackets - closedBrackets
                 val equationWithAutoBrackets = currentEquation + ")".repeat(missingBrackets)
                 openBracketClicked = false
-                return calculator.calculate(this, equationWithAutoBrackets)
+                return calculator.calculate(this, equationWithAutoBrackets, userSettingsDecimalPlaces)
             } else {
                 return if (equalsClicked) "error" else ""
             }
         }
         displayFragment.displayEquation(currentEquation)
-        return calculator.calculate(this, currentEquation)
+        return calculator.calculate(this, currentEquation, userSettingsDecimalPlaces)
     }
 
     private fun showToast(message: String) {
@@ -192,6 +193,37 @@ class MainActivity : AppCompatActivity() {
         displayFragment.updateResult(result)
         operatorClicked = false
         equalsClicked = false
+    }
+
+    fun onDecimalClick() {
+        val cursorPosition = displayFragment.getCursorPosition()
+        val leftOfCursor = currentEquation.substring(0, cursorPosition)
+        val rightOfCursor = currentEquation.substring(cursorPosition)
+
+        // Prevent user from entering two decimal points in a row
+        if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() == '.')
+            || (rightOfCursor.isNotEmpty() && rightOfCursor.first() == '.')) {
+            return
+       }
+
+        // If there is a leading decimal point, add a 0 before it
+        if (leftOfCursor.isEmpty() || leftOfCursor.last() in setOf('+', '~', '×', '÷', '(')) {
+            val leadingZero = "0."
+            currentEquation = "$leftOfCursor$leadingZero$rightOfCursor"
+        } else {
+            currentEquation = "$leftOfCursor.$rightOfCursor"
+        }
+
+        displayFragment.displayEquation(currentEquation)
+        val newCursorPosition = cursorPosition + 1
+        displayFragment.setCursorPosition(newCursorPosition)
+
+        operatorClicked = false
+        equalsClicked = false
+        openBracketClicked = false
+
+        val result = calculateResult()
+        displayFragment.updateResult(result)
     }
 
     fun onBackspaceClick() {

@@ -2,13 +2,14 @@ package com.example.calculator
 
 import android.content.Context
 import android.util.Log
+import java.util.Locale
 
 class Calculator
 {
 
     // Use the shunting-yard algorithm to calculate the result of the equation
     // Reference: https://brilliant.org/wiki/shunting-yard-algorithm/
-    fun calculate(context: Context, equation: String) : String {
+    fun calculate(context: Context, equation: String, decimalPlaces: String = "10") : String {
         // todo handle invalid equations (old way pasted below for reference when refactoring)
 //        if (operators.size != (numbers.size - 1)) {
 //            Toast.makeText(context, "Invalid equation", Toast.LENGTH_SHORT).show()
@@ -21,7 +22,7 @@ class Calculator
             return if (equation.isEmpty()) "" else "error"
         } else {
             val result = try {
-                evaluatePostfix(postfix)
+                evaluatePostfix(postfix, decimalPlaces)
             } catch (e: Exception) {
                 "error" // Or handle the error appropriately
             }
@@ -34,7 +35,8 @@ class Calculator
         val operatorList : MutableList<String> = mutableListOf()
 
         // Regex to parse the equation for numbers, operators, and brackets
-        val regex = Regex("(-?[0-9.]+)|([+~×÷()])")
+        // Match numbers with an optional negative sign and/or optional decimal point
+        val regex = Regex("(-?[0-9]+\\.?[0-9]*)|([+~×÷()])")
 
         regex.findAll(equation).forEach {
             val currentToken = it.value
@@ -86,7 +88,7 @@ class Calculator
         return output
     }
 
-    private fun evaluatePostfix(postfix: MutableList<String>) : String {
+    private fun evaluatePostfix(postfix: MutableList<String>, decimalPlaces: String) : String {
         val stack = mutableListOf<String>()
 
         postfix.forEach { token ->
@@ -101,13 +103,15 @@ class Calculator
                 val num2 =  stack.removeLast()
                 val num1 = stack.removeLast()
 
+                // Regex to match numbers with an optional negative sign and/or optional decimal point
+                val numberPattern = "-?[0-9]+\\.?[0-9]*"
                 // Check if num1 and num2 are numbers (not brackets)
-                if (num1.matches(Regex("-?[0-9.]+")) && num2.matches(Regex("-?[0-9.]+"))) {
+                if (num1.matches(Regex(numberPattern)) && num2.matches(Regex(numberPattern))) {
                     val result = when (token) {
-                        "+" -> num1.toInt() + num2.toInt()
-                        "~" -> num1.toInt() - num2.toInt()
-                        "×" -> num1.toInt() * num2.toInt()
-                        "÷" -> num1.toInt() / num2.toInt()
+                        "+" -> num1.toDouble() + num2.toDouble()
+                        "~" -> num1.toDouble() - num2.toDouble()
+                        "×" -> num1.toDouble() * num2.toDouble()
+                        "÷" -> num1.toDouble() / num2.toDouble()
                         // TODO: handle error
                         else -> {
                             Log.i("testcat", "Invalid operator")
@@ -125,7 +129,15 @@ class Calculator
             }
         }
         // Check for single result or error
-        return if (stack.size == 1) stack.last() else "error"
+        if (stack.size == 1) {
+            val result = stack.last().toDouble()
+            // Format the result to 10 decimal places and remove trailing zeros and decimal points
+            val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0')
+                .trimEnd('.')
+            return formattedResult
+        } else {
+            return "error"
+        }
     }
 
     // Get the precedence of an operator

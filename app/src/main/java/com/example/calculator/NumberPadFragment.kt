@@ -28,6 +28,7 @@ class NumberPadFragment : Fragment() {
         binding.buttonEquals.setOnClickListener { activity.onEqualsClick() }
         binding.buttonBracketOpen.setOnClickListener { activity.onBracketClick("(") }
         binding.buttonBracketClose.setOnClickListener { activity.onBracketClick(")") }
+        binding.buttonDecimal.setOnClickListener { activity.onDecimalClick() }
 
         return binding.root
     }
