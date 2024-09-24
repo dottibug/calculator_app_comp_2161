@@ -25,8 +25,9 @@ class NumberPadFragment : Fragment() {
         createNumberClickListeners(activity)
         createOperatorClickListeners(activity)
         binding.buttonClear.setOnClickListener { activity.onClearClick() }
-        binding.buttonEquals.setOnClickListener { activity.onEqualsClick()
-        }
+        binding.buttonEquals.setOnClickListener { activity.onEqualsClick() }
+        binding.buttonBracketOpen.setOnClickListener { activity.onBracketClick("(") }
+        binding.buttonBracketClose.setOnClickListener { activity.onBracketClick(")") }
 
         return binding.root
     }

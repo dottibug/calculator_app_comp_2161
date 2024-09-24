@@ -18,7 +18,7 @@
             style="@style/clearButtonStyle"
             android:text="@string/clear"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/buttonBrackets"
+            app:layout_constraintEnd_toStartOf="@+id/buttonBracketOpen"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,25 +26,24 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <Button
-            android:id="@+id/buttonBrackets"
+            android:id="@+id/buttonBracketOpen"
             style="@style/numberButtonStyle"
-            android:text="@string/brackets"
+            android:text="@string/bracketOpen"
             android:textSize="22sp"
             app:layout_constraintBottom_toBottomOf="@+id/buttonClear"
-            app:layout_constraintEnd_toStartOf="@+id/buttonPercent"
+            app:layout_constraintEnd_toStartOf="@+id/buttonBracketClose"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/buttonClear"
             app:layout_constraintTop_toTopOf="@+id/buttonClear" />
 
         <Button
-            android:id="@+id/buttonPercent"
+            android:id="@+id/buttonBracketClose"
             style="@style/numberButtonStyle"
-            android:text="@string/percent"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonBrackets"
+            android:text="@string/bracketClose"
             app:layout_constraintEnd_toStartOf="@+id/buttonDivide"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonBrackets"
-            app:layout_constraintTop_toTopOf="@+id/buttonBrackets" />
+            app:layout_constraintStart_toEndOf="@+id/buttonBracketOpen"
+            app:layout_constraintTop_toTopOf="@+id/buttonBracketOpen" />
 
         <Button
             android:id="@+id/buttonDivide"
@@ -52,11 +51,11 @@
             android:gravity="center"
             android:includeFontPadding="false"
             android:text="@string/divide"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonPercent"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonBracketClose"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonPercent"
-            app:layout_constraintTop_toTopOf="@+id/buttonPercent" />
+            app:layout_constraintStart_toEndOf="@+id/buttonBracketClose"
+            app:layout_constraintTop_toTopOf="@+id/buttonBracketClose" />
 
         <Button
             android:id="@+id/button7"

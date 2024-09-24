@@ -163,6 +163,19 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
+    fun onBracketClick(bracket: String) {
+        val cursorPosition = displayFragment.getCursorPosition()
+        val leftOfCursor = currentEquation.substring(0, cursorPosition)
+        val rightOfCursor = currentEquation.substring(cursorPosition)
+        currentEquation = "$leftOfCursor$bracket$rightOfCursor"
+        displayFragment.displayEquation(currentEquation)
+        val newCursorPosition = cursorPosition + 1
+        displayFragment.setCursorPosition(newCursorPosition)
+        calculateResult()
+        operatorClicked = false
+        equalsClicked = false
+    }
+
     fun onBackspaceClick() {
         // get the cursor position and the current equation
         // if the cursor is at the beginning of the equation, do nothing

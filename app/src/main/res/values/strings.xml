@@ -37,7 +37,8 @@
     <string name="sign">+/-</string>
     <string name="percent">%</string>
     <string name="clear">C</string>
-    <string name="brackets">( )</string>
+    <string name="bracketClose">)</string>
+    <string name="bracketOpen">(</string>
 
     <!-- Operators -->
     <!-- ( − ) is the mathematical minus sign, not the hyphen symbol -->

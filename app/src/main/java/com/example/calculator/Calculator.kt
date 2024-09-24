@@ -1,91 +1,135 @@
 package com.example.calculator
 
 import android.content.Context
-import android.widget.Toast
+import android.util.Log
+
+// next commit -m : "Refactor calculator class to implement shunting-yard algorithm and handle brackets"
 
 class Calculator
 {
+
+    // Use the shunting-yard algorithm to calculate the result of the equation
+    // Reference: https://brilliant.org/wiki/shunting-yard-algorithm/
     fun calculate(context: Context, equation: String) : String {
-        // Split the equation string into mutable arrays of numbers and operators
-        val numbers = getNumbersList(equation)
-        val operators = getOperatorsList(equation)
+        // todo handle invalid equations (old way pasted below for reference when refactoring)
+//        if (operators.size != (numbers.size - 1)) {
+//            Toast.makeText(context, "Invalid equation", Toast.LENGTH_SHORT).show()
+//            return "error"
+//        }
 
-        // Check that the number of operators is one less than the number of numbers
-        // If it is not, the equation is invalid (too many operators)
-        // TODO when brackets are implemented, you will have to consider equations such as 1-(+12)
-        if (operators.size != (numbers.size - 1)) {
-            Toast.makeText(context, "Invalid equation", Toast.LENGTH_SHORT).show()
-            return "error"
-        }
+        val postfix = getPostfixExpression(equation)
+        Log.i("testcat", "postfix: $postfix")
 
-        // BEDMAS Order of operations
-        // TODO need to handle brackets
-        // TODO need to handle exponents (scientific mode)
+        // Evaluate the postfix expression
+        val result = evaluatePostfix(postfix)
+        Log.i("testcat", "result: $result")
 
-        val (updatedNumbers, updatedOperators) = handleMultiplicationAndDivision(numbers, operators)
-        return performRemainingOperations(updatedNumbers, updatedOperators)
+
+        return result
     }
 
-    // Performs the remaining operations after multiplication and division have been handled
-    private fun performRemainingOperations(numbers: MutableList<String>, operators:
-    MutableList<String>) : String {
-        var result = numbers[0].toInt()
+    fun getPostfixExpression(equation: String) : MutableList<String> {
+        val output : MutableList<String> = mutableListOf()
+        val operatorList : MutableList<String> = mutableListOf()
 
-        for (i in operators.indices) {
-            // NOTE: × is not the letter x, it is the multiplication symbol
-            when (operators[i]) {
-                "+" -> result += numbers[i+1].toInt()
-                "~" -> result -= numbers[i+1].toInt()
-                "×" -> result *= numbers[i+1].toInt()
-                "÷" -> result /= numbers[i+1].toInt()
+        // Regex to parse the equation for numbers, operators, and brackets
+        val regex = Regex("(-?[0-9.]+)|([+~×÷()])")
+
+        regex.findAll(equation).forEach {
+            val currentToken = it.value
+
+            when {
+                // If the token is a number, add it to the output list
+                currentToken.matches(Regex("-?[0-9.]+")) -> { output.add(currentToken) }
+
+                // If the token is an open bracket, add it to the operator list
+                currentToken == "(" -> { operatorList.add(currentToken) }
+
+                // If the token is a close bracket, add all operators to the output list until an
+                // open bracket is found
+                currentToken == ")" -> {
+                    while (operatorList.last() != "(") {
+                        output.add(operatorList.removeLast())
+
+                        // If operatorList is empty, then there are mismatched brackets
+                        if (operatorList.isEmpty()) {
+                            // TODO handle mismatched brackets
+                            Log.i("testcat", "mismatched brackets")
+                            return mutableListOf()
+                        }
+                    }
+                    // Remove the open bracket from the operator list
+                    operatorList.removeLast()
+                }
+
+                // If the token is an operator, add it to the operator list if it has a higher
+                // precedence than the top of the operator list, or if the operator list is empty.
+                // Otherwise, add all operators to the output list until an operator with a lower
+                // precedence is found or the operator list is empty.
+                // NOTE: × is not the letter x, it is the multiplication symbol
+                currentToken in setOf("+", "~", "×", "÷") -> {
+                    while (operatorList.isNotEmpty() &&
+                        operatorList.last() != "(" &&
+                        getPrecedence(operatorList.last()) >= getPrecedence(currentToken)) {
+                        output.add(operatorList.removeLast())
+                    }
+                    operatorList.add(currentToken)
+                }
             }
         }
-        return result.toString()
-    }
-
-    // Handles multiplication and division to follow BEDMAS order of operations. Returns the
-    // updated lists as a Pair
-    private fun handleMultiplicationAndDivision(numbers: MutableList<String>, operators:
-    MutableList<String>) : Pair<MutableList<String>, MutableList<String>> {
-        var i = 0
-        while (i < operators.size) {
-            // NOTE: × is not the letter x, it is the multiplication symbol
-            if (operators[i] == "×" || operators[i] == "÷") {
-                // Multiply or divide the numbers (i and i+1)
-                val currentResult = if (operators[i] == "×") numbers[i].toInt() * numbers[i+1].toInt()
-                else numbers[i].toInt() / numbers[i+1].toInt()
-
-                // Replace numbers[i] with the result then remove numbers[i+1] from the numbers list
-                numbers[i] = currentResult.toString()
-                numbers.removeAt(i+1)
-
-                // Remove operators[i] from the operators list
-                operators.removeAt(i)
-
-                // Reset i to 0: This restarts the loop from the beginning. The size of the lists
-                // have changed after removing elements, so the indices of the remaining elements
-                // have also changed. Without resetting i, the loop would skip the remaining
-                // elements to be calculated and the result would be incorrect
-                i = 0
-                continue
-            }
-            i++
+        // Add any remaining operators from operatorList to output
+        while (operatorList.isNotEmpty()) {
+            output.add(operatorList.removeLast())
         }
-        return Pair(numbers, operators)
+
+        return output
     }
 
-    // Get a mutable list of numbers from the equation string
-    private fun getNumbersList(equation: String) : MutableList<String> {
+    private fun evaluatePostfix(postfix: MutableList<String>) : String {
+        val stack = mutableListOf<String>()
+
+        postfix.forEach { token ->
+            // NOTE: × is not the letter x, it is the multiplication symbol
+            if (token in setOf("+", "~", "×", "÷")) {
+                // Pop the top two numbers from the stack, perform the operation, and push the
+                // result back onto the stack
+                val num2 =  stack.removeLast()
+                val num1 = stack.removeLast()
+
+                // Check if num1 and num2 are numbers (not brackets)
+                if (num1.matches(Regex("-?[0-9.]+")) && num2.matches(Regex("-?[0-9.]+"))) {
+                    val result = when (token) {
+                        "+" -> num1.toInt() + num2.toInt()
+                        "~" -> num1.toInt() - num2.toInt()
+                        "×" -> num1.toInt() * num2.toInt()
+                        "÷" -> num1.toInt() / num2.toInt()
+                        // TODO: handle error
+                        else -> {
+                            Log.i("testcat", "Invalid operator")
+                            return "error"
+                        }
+                    }
+                    stack.add(result.toString())
+                } else {
+                    Log.i("testcat", "Invalid expression")
+                    return "error"
+                }
+            } else {
+                // Push the number onto the stack
+                stack.add(token)
+            }
+        }
+        // Check for single result or error
+        return if (stack.size == 1) stack.last() else "error"
+    }
+
+    // Get the precedence of an operator
+    private fun getPrecedence(operator: String) : Int {
         // NOTE: × is not the letter x, it is the multiplication symbol
-        // NOTE: ~ is used to represent subtraction and allow for easy parsing of minus vs negative
-        return equation.split("+", "~", "×", "÷").filter { it.isNotEmpty() }.toMutableList()
-    }
-
-    // Get a mutable list of operators from the equation string
-    private fun getOperatorsList(equation: String) : MutableList<String> {
-        // Find all operators in the equation, map them to a list, and return the list
-        // it.value is the value of the match (an operator)
-        val regex = Regex("[+~×÷]")
-        return regex.findAll(equation).map { it.value }.toMutableList()
+        return when (operator) {
+            "÷", "×" -> 2
+            "+", "~" -> 1
+            else -> 0
+        }
     }
 }
