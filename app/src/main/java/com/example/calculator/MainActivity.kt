@@ -208,6 +208,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Prevent user from entering a closing bracket if there is no opening bracket
+        if (!leftOfCursor.contains('(') && bracket == ")") {
+            return
+        }
+
         // Add a multiplication symbol if user enters a closing bracket right beside an opening
         // bracket
         if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() == ')' && bracket == "(")) {

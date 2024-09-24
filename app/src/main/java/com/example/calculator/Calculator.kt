@@ -18,6 +18,8 @@ class Calculator
 
         val postfix = getPostfixExpression(equation)
 
+        Log.i("testcat", "postfix: $postfix")
+
         if (postfix.isEmpty()) {
             return if (equation.isEmpty()) "" else "error"
         } else {
