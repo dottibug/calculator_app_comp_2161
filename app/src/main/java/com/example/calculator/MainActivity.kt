@@ -187,12 +187,17 @@ class MainActivity : AppCompatActivity() {
         val leftOfCursor = currentEquation.substring(0, cursorPosition)
         val rightOfCursor = currentEquation.substring(cursorPosition)
 
+        // Prevent user from entering closing bracket as the first character in an equation
+        if (leftOfCursor.isEmpty() && bracket == ")") {
+            return
+        }
+
         // Prevent user from entering a closing bracket right beside an opening bracket
         if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() == '(' && bracket == ")")) {
             return
         }
 
-        // Prevent user from entering a closing bracket beside an operator
+        // Prevent user from entering a closing bracket to the right of an operator or decimal
         if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷', '.') &&
                     bracket == ")")) {
             return
