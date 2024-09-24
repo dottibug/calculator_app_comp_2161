@@ -16,24 +16,20 @@ class Calculator
 //        }
 
         val postfix = getPostfixExpression(equation)
-        Log.i("testcat", "postfix: $postfix")
-        Log.i("testcat", "is postfix empty: ${postfix.isEmpty()}")
 
         if (postfix.isEmpty()) {
-            return "error"
+            return if (equation.isEmpty()) "" else "error"
         } else {
-
-        // Evaluate the postfix expression
-        val result = evaluatePostfix(postfix)
-        Log.i("testcat", "result: $result")
-
-
+            val result = try {
+                evaluatePostfix(postfix)
+            } catch (e: Exception) {
+                "error" // Or handle the error appropriately
+            }
         return result
         }
-
     }
 
-    fun getPostfixExpression(equation: String) : MutableList<String> {
+    private fun getPostfixExpression(equation: String) : MutableList<String> {
         val output : MutableList<String> = mutableListOf()
         val operatorList : MutableList<String> = mutableListOf()
 
@@ -96,6 +92,10 @@ class Calculator
         postfix.forEach { token ->
             // NOTE: × is not the letter x, it is the multiplication symbol
             if (token in setOf("+", "~", "×", "÷")) {
+
+                // Check if there are at least two numbers in the stack
+                if (stack.size < 2) { return "" }
+
                 // Pop the top two numbers from the stack, perform the operation, and push the
                 // result back onto the stack
                 val num2 =  stack.removeLast()
