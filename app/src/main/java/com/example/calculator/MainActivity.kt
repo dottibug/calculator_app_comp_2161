@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
                 val rightOfCursor = currentEquation.substring(cursorPosition)
 
                 // Prevent user from entering an operator to the left of an opening bracket
-                if (leftOfCursor.isNotEmpty() && leftOfCursor.first() == '(') {
+                if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '(') {
                     return
                 }
 
@@ -213,6 +213,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Prevent user from entering an opening bracket if there is an operator to the immediate
+        // right
+        if (bracket == "(" && rightOfCursor.isNotEmpty() && rightOfCursor.first() in setOf('+', '~', '×', '÷')) {
+            return
+        }
+
         // Add a multiplication symbol if user enters a closing bracket right beside an opening
         // bracket
         if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() == ')' && bracket == "(")) {
@@ -220,11 +226,14 @@ class MainActivity : AppCompatActivity() {
             currentEquation = "$leftOfCursor$multiplication$rightOfCursor"
             updateEquation(cursorPosition + 1)
             updateResult()
-        } else {
-            currentEquation = "$leftOfCursor$bracket$rightOfCursor"
-            updateEquation(cursorPosition)
-            updateResult()
+            operatorClicked = false
+            equalsClicked = false
+            return
         }
+
+        currentEquation = "$leftOfCursor$bracket$rightOfCursor"
+        updateEquation(cursorPosition)
+        updateResult()
 
         operatorClicked = false
         equalsClicked = false
