@@ -1,6 +1,7 @@
 package com.example.calculator
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private var equalsClicked : Boolean = false
     private var finalResult : String = ""
     private var currentEquation : String = ""
+    private var openBracketClicked : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             displayFragment.setCursorPosition(newCursorPosition)
         }
 
-        if (operatorClicked) {
+        if (operatorClicked || openBracketClicked) {
             val result = calculateResult()
             displayFragment.updateResult(result)
         }
@@ -155,7 +157,37 @@ class MainActivity : AppCompatActivity() {
     // Calculate the result of the equation
     private fun calculateResult() : String {
         val calculator = Calculator()
-        // todo if return is error, then show a toast (to take the toast out of the calculator class)
+
+        // TEST START
+        // Check for missing closing brackets
+        var openBrackets = currentEquation.count { it == '(' }
+        var closedBrackets = currentEquation.count { it == ')' }
+        if (openBrackets > closedBrackets) {
+            // Add missing closing brackets ONLY if there is a number somewhere after it
+            if (currentEquation.substringAfterLast('(').any { it.isDigit() }) {
+                val missingBrackets = openBrackets - closedBrackets
+                val equationWithAutoBrackets = currentEquation + ")".repeat(missingBrackets)
+//                currentEquation += ")".repeat(missingBrackets)
+                Log.i("testcat", "equation after missing brackets added: $equationWithAutoBrackets")
+
+
+                // TEST START
+                openBracketClicked = false
+                return calculator.calculate(this, equationWithAutoBrackets)
+                // TEST END
+            } else {
+                // if equalsClicked, then return error; else return ""
+                if (equalsClicked) { return "error" }
+                else { return "" }
+            }
+        }
+
+            displayFragment.displayEquation(currentEquation)
+        // TEST END
+
+
+        // TODO if return is error, then show a toast (to take the toast out of the calculator
+        //  class)
         return calculator.calculate(this, currentEquation)
     }
 
@@ -164,6 +196,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onBracketClick(bracket: String) {
+        // TEST START
+        if (bracket == "(") { openBracketClicked = true }
+        else { openBracketClicked = false }
+        // TEST END
+
         val cursorPosition = displayFragment.getCursorPosition()
         val leftOfCursor = currentEquation.substring(0, cursorPosition)
         val rightOfCursor = currentEquation.substring(cursorPosition)
@@ -171,9 +208,12 @@ class MainActivity : AppCompatActivity() {
         displayFragment.displayEquation(currentEquation)
         val newCursorPosition = cursorPosition + 1
         displayFragment.setCursorPosition(newCursorPosition)
-        calculateResult()
+        val result = calculateResult()
+        displayFragment.updateResult(result)
         operatorClicked = false
         equalsClicked = false
+
+
     }
 
     fun onBackspaceClick() {
@@ -185,13 +225,20 @@ class MainActivity : AppCompatActivity() {
             return
         } else {
             // Delete the character at the cursor position
+            Log.i("testcat", "equation when backspace clicked: $currentEquation")
+
             val leftOfCursor = currentEquation.substring(0, cursorPosition - 1)
             val rightOfCursor = currentEquation.substring(cursorPosition)
             currentEquation = "$leftOfCursor$rightOfCursor"
+
+            Log.i("testcat", "equation after backspace: $currentEquation")
+
             displayFragment.displayEquation(currentEquation)
             val newCursorPosition = cursorPosition - 1
             displayFragment.setCursorPosition(newCursorPosition)
-            calculateResult()
+
+            val result = calculateResult()
+            displayFragment.updateResult(result)
         }
     }
 }

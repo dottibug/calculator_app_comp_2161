@@ -3,8 +3,6 @@ package com.example.calculator
 import android.content.Context
 import android.util.Log
 
-// next commit -m : "Refactor calculator class to implement shunting-yard algorithm and handle brackets"
-
 class Calculator
 {
 
@@ -19,6 +17,11 @@ class Calculator
 
         val postfix = getPostfixExpression(equation)
         Log.i("testcat", "postfix: $postfix")
+        Log.i("testcat", "is postfix empty: ${postfix.isEmpty()}")
+
+        if (postfix.isEmpty()) {
+            return "error"
+        } else {
 
         // Evaluate the postfix expression
         val result = evaluatePostfix(postfix)
@@ -26,6 +29,8 @@ class Calculator
 
 
         return result
+        }
+
     }
 
     fun getPostfixExpression(equation: String) : MutableList<String> {
