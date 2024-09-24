@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private var currentEquation : String = ""
     private var openBracketClicked : Boolean = false
     private var userSettingsDecimalPlaces : String = "10" // default to 10 decimal places
+    private var digitCount : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +47,18 @@ class MainActivity : AppCompatActivity() {
         finalResult = ""
         equalsClicked = false
         operatorClicked = false
+        digitCount = 0
     }
 
     // Equals button click handler
     fun onEqualsClick() {
+        // TEST START
+        if (digitCount > 12) {
+            showToast("Maximum digits reached")
+            return
+        }
+        // TEST END
+
         if (currentEquation.isEmpty() || currentEquation.last() == '+' || currentEquation.last() == '~' || currentEquation.last() == '×' || currentEquation.last() == '÷') {
             showToast("Invalid equation")
             return
@@ -66,6 +75,10 @@ class MainActivity : AppCompatActivity() {
 
     // Number button click handler
     fun onNumberClick(number: String) {
+        if (digitCount > 12) {
+            showToast("Maximum digits reached")
+            return
+        }
 
         val cursorPosition = displayFragment.getCursorPosition()
         val leftOfCursor = currentEquation.substring(0, cursorPosition)
@@ -101,6 +114,11 @@ class MainActivity : AppCompatActivity() {
 
     // Operator button click handler
     fun onOperatorClick(operator: String) {
+        if (digitCount > 12) {
+            showToast("Maximum digits reached")
+            return
+        }
+
         if (currentEquation.isEmpty() && finalResult.isEmpty()) {
             showToast("Invalid equation")
             return
@@ -172,20 +190,56 @@ class MainActivity : AppCompatActivity() {
                 val missingBrackets = openBrackets - closedBrackets
                 val equationWithAutoBrackets = currentEquation + ")".repeat(missingBrackets)
                 openBracketClicked = false
-                return calculator.calculate(this, equationWithAutoBrackets, userSettingsDecimalPlaces)
+
+                // Check length of result
+                val result = calculator.calculate(this, equationWithAutoBrackets, userSettingsDecimalPlaces)
+                if (checkDigitCount(result) > 12) {
+                    showToast("Maximum digits reached")
+                    // TODO Change this to return the most recent result and equation that was
+                    //  not too long (instead of returning a blank string)??
+                    return ""
+                } else {
+                    return result
+                }
+
+//                return calculator.calculate(this, equationWithAutoBrackets, userSettingsDecimalPlaces)
             } else {
                 return if (equalsClicked) "error" else ""
             }
         }
         displayFragment.displayEquation(currentEquation)
-        return calculator.calculate(this, currentEquation, userSettingsDecimalPlaces)
+
+        // Check length of result
+        val result = calculator.calculate(this, currentEquation, userSettingsDecimalPlaces)
+        if (checkDigitCount(result) > 12) {
+             showToast("Maximum digits reached")
+            // TODO Change this to return the most recent result and equation that was
+            //  not too long (instead of returning a blank string)??
+            return ""
+        }
+
+        return result
     }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun checkDigitCount(result : String) : Int {
+        digitCount = result.count { it.isDigit() }
+        if (digitCount > 12) {
+            return digitCount
+        } else {
+            return digitCount
+        }
+    }
+
     fun onBracketClick(bracket: String) {
+        if (digitCount > 12) {
+            showToast("Maximum digits reached")
+            return
+        }
+
         openBracketClicked = bracket == "("
 
         val cursorPosition = displayFragment.getCursorPosition()
@@ -251,6 +305,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onDecimalClick() {
+        if (digitCount > 12) {
+            showToast("Maximum digits reached")
+            return
+        }
+
         val cursorPosition = displayFragment.getCursorPosition()
         val leftOfCursor = currentEquation.substring(0, cursorPosition)
         val rightOfCursor = currentEquation.substring(cursorPosition)

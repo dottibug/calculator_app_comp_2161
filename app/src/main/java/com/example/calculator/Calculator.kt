@@ -28,7 +28,8 @@ class Calculator
             } catch (e: Exception) {
                 "error" // Or handle the error appropriately
             }
-        return result
+
+            return result
         }
     }
 
