@@ -182,17 +182,42 @@ class MainActivity : AppCompatActivity() {
 
     fun onBracketClick(bracket: String) {
         openBracketClicked = bracket == "("
+
         val cursorPosition = displayFragment.getCursorPosition()
         val leftOfCursor = currentEquation.substring(0, cursorPosition)
         val rightOfCursor = currentEquation.substring(cursorPosition)
-        currentEquation = "$leftOfCursor$bracket$rightOfCursor"
+
+        // Prevent user from entering a closing bracket right beside an opening bracket
+        if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() == '(' && bracket == ")")) {
+            return
+        }
+
+        // Add a multiplication symbol if user enters a closing bracket right beside an opening
+        // bracket
+        if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() == ')' && bracket == "(")) {
+            val multiplication = "×("
+            currentEquation = "$leftOfCursor$multiplication$rightOfCursor"
+            updateEquation(cursorPosition + 1)
+            updateResult()
+        } else {
+            currentEquation = "$leftOfCursor$bracket$rightOfCursor"
+            updateEquation(cursorPosition)
+            updateResult()
+        }
+
+        operatorClicked = false
+        equalsClicked = false
+    }
+
+    private fun updateEquation(cursorPosition: Int) {
         displayFragment.displayEquation(currentEquation)
         val newCursorPosition = cursorPosition + 1
         displayFragment.setCursorPosition(newCursorPosition)
+    }
+
+    private fun updateResult() {
         val result = calculateResult()
         displayFragment.updateResult(result)
-        operatorClicked = false
-        equalsClicked = false
     }
 
     fun onDecimalClick() {
