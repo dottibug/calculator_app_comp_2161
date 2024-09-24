@@ -286,6 +286,19 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Add a multiplication symbol if user enters an opening bracket to the immediate right
+        // of a digit
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('0', '1', '2', '3', '4',
+                '5', '6', '7', '8', '9')) {
+            val multiplication = "×("
+            currentEquation = "$leftOfCursor$multiplication$rightOfCursor"
+            updateEquation(cursorPosition + 1)
+            updateResult()
+            operatorClicked = false
+            equalsClicked = false
+            return
+            }
+
         currentEquation = "$leftOfCursor$bracket$rightOfCursor"
         updateEquation(cursorPosition)
         updateResult()
