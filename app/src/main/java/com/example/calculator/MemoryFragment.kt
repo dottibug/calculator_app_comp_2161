@@ -17,6 +17,17 @@ class MemoryFragment : Fragment() {
     ): View {
         // Inflate the dataBinding layout for this fragment
         binding = FragmentMemoryBinding.inflate(inflater, container, false)
+
+        // Get the parent activity
+        val activity = requireActivity() as MainActivity
+
+        // Create click listeners
+        binding.buttonMemoryClear.setOnClickListener {  }
+        binding.buttonMemoryStore.setOnClickListener { activity.onMemoryStore() }
+        binding.buttonMemoryRecall.setOnClickListener {  }
+        binding.buttonMemoryAdd.setOnClickListener {  }
+        binding.buttonMemorySubtract.setOnClickListener {  }
+
         return binding.root
     }
 }

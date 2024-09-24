@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private var openBracketClicked : Boolean = false
     private var userSettingsDecimalPlaces : String = "10" // default to 10 decimal places
     private var digitCount : Int = 0
+    private var memory : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -491,6 +492,22 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
+
+    ////////////// MEMORY FUNCTIONS //////////////
+    fun onMemoryClear() {
+        // Clear memory to ""
+    }
+
+    fun onMemoryStore() {
+        // If no finalResult, check equation for ONE number to store
+        // If there is a finalResult, store that
+    }
+
+    fun onMemoryRecall() {}
+
+    fun onMemoryAdd() {}
+
+    fun onMemorySubtract() {}
 
 }
 
