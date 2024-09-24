@@ -192,6 +192,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Prevent user from entering a closing bracket beside an operator
+        if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷', '.') &&
+                    bracket == ")")) {
+            return
+        }
+
         // Add a multiplication symbol if user enters a closing bracket right beside an opening
         // bracket
         if ((leftOfCursor.isNotEmpty() && leftOfCursor.last() == ')' && bracket == "(")) {
