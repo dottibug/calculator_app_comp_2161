@@ -1,6 +1,7 @@
 package com.example.calculator
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -351,13 +352,132 @@ class MainActivity : AppCompatActivity() {
             // Delete the character at the cursor position
             val leftOfCursor = currentEquation.substring(0, cursorPosition - 1)
             val rightOfCursor = currentEquation.substring(cursorPosition)
-            currentEquation = "$leftOfCursor$rightOfCursor"
+
+            if (leftOfCursor.last() == '-') {
+                currentEquation = leftOfCursor.dropLast(1)
+                displayFragment.displayEquation(currentEquation)
+                val newCursorPosition = cursorPosition - 1
+                displayFragment.setCursorPosition(newCursorPosition)
+            } else {
+                currentEquation = "$leftOfCursor$rightOfCursor"
+                displayFragment.displayEquation(currentEquation)
+                val newCursorPosition = cursorPosition - 1
+                displayFragment.setCursorPosition(newCursorPosition)
+                val result = calculateResult()
+                displayFragment.updateResult(result)
+            }
+        }
+    }
+
+    fun onSignClick() {
+        Log.i("testcat", "onSignClick")
+
+        val cursorPosition = displayFragment.getCursorPosition()
+        val leftOfCursor = currentEquation.substring(0, cursorPosition)
+        val rightOfCursor = currentEquation.substring(cursorPosition)
+
+        // If equation is empty -> (-
+        if (currentEquation.isEmpty()) {
+            currentEquation = "-("
+            displayFragment.displayEquation(currentEquation)
+            val newCursorPosition = 2
+            displayFragment.setCursorPosition(newCursorPosition)
+            return
+        }
+
+        // If equation is just a number -> change pos num to neg, and neg num to pos
+            // 55 -> (-55
+            // (-55  -> 55
+        if (isNumber(currentEquation)) {
+            if (currentEquation.contains("(-")) {
+                currentEquation = currentEquation.replace("(-", "")
+                displayFragment.displayEquation(currentEquation)
+                val newCursorPosition = cursorPosition - 2
+                displayFragment.setCursorPosition(newCursorPosition)
+                return
+            } else {
+                currentEquation = "(-$currentEquation"
+                displayFragment.displayEquation(currentEquation)
+                val newCursorPosition = cursorPosition + 2
+                displayFragment.setCursorPosition(newCursorPosition)
+                return
+            }
+
+        }
+
+        // If the last character to the left of the cursor is an operator -> (-
+            // 55+ -> 55+(-
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷')) {
+            val negativeSign = "(-"
+            currentEquation = "$leftOfCursor$negativeSign$rightOfCursor"
+            displayFragment.displayEquation(currentEquation)
+            val newCursorPosition = cursorPosition + 2
+            displayFragment.setCursorPosition(newCursorPosition)
+            return
+        }
+
+        // If the last character to the left of the cursor is an opening bracket ->  -
+            // 55+(  => 55+(-
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '(') {
+            val negativeSign = "-"
+            currentEquation = "$leftOfCursor$negativeSign$rightOfCursor"
+            displayFragment.displayEquation(currentEquation)
+            val newCursorPosition = cursorPosition + 1
+            displayFragment.setCursorPosition(newCursorPosition)
+        }
+
+        // If the last character to the left of the cursor is a negative sign -> remove it
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '-') {
+            currentEquation = currentEquation.dropLast(1)
             displayFragment.displayEquation(currentEquation)
             val newCursorPosition = cursorPosition - 1
             displayFragment.setCursorPosition(newCursorPosition)
-            val result = calculateResult()
-            displayFragment.updateResult(result)
+        }
+
+        // If the last character to the left of the cursor is a number, get the substring of
+        // digits between most recent operator and cursor position, and change the sign of that number
+            // 55+63 -> 55+(-63
+            // 55+(-63  ->  55+63
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last().isDigit()) {
+            val numberSubstring = getSubstringAfterLastOperator(leftOfCursor, cursorPosition)
+
+            if (numberSubstring.contains('-')) {
+                val newNumber = numberSubstring.replace("(-", "")
+                val startIndex = cursorPosition - numberSubstring.length
+                currentEquation = currentEquation.replaceRange(startIndex, cursorPosition, newNumber)
+                displayFragment.displayEquation(currentEquation)
+                val newCursorPosition = cursorPosition - 2
+                displayFragment.setCursorPosition(newCursorPosition)
+                val result = calculateResult()
+                displayFragment.updateResult(result)
+            } else {
+                val newNumber = "(-$numberSubstring"
+                val startIndex = cursorPosition - numberSubstring.length
+                currentEquation = currentEquation.replaceRange(startIndex, cursorPosition, newNumber)
+                displayFragment.displayEquation(currentEquation)
+                val newCursorPosition = cursorPosition + 2
+                displayFragment.setCursorPosition(newCursorPosition)
+                val result = calculateResult()
+                displayFragment.updateResult(result)
+            }
         }
     }
+
+    private fun getSubstringAfterLastOperator(input: String, cursorPosition: Int) : String {
+        val lastOperatorIndex = input.lastIndexOfAny(charArrayOf('+', '~', '×', '÷'))
+        return input.substring(lastOperatorIndex + 1, cursorPosition)
+    }
+
+
+    private fun isNumber(input: String): Boolean {
+        // If equation does not contain operators, it is a number
+        if (input.contains("+") || input.contains("~") || input.contains("×") || input.contains
+                ("÷")
+        ) {
+            return false
+        }
+        return true
+    }
+
 }
 
