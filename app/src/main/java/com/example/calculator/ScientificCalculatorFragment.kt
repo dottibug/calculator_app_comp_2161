@@ -75,7 +75,7 @@ class ScientificCalculatorFragment : Fragment() {
         // Render equation and result
         equation = "$leftOfCursor$number$rightOfCursor"
         displayFragment.renderEquation(equation, cursorPosition, 1)
-        displayBedmasResult(equation)
+        calculateBedmasResult(equation)
     }
 
     // Handle operator clicks
@@ -94,7 +94,7 @@ class ScientificCalculatorFragment : Fragment() {
         // Render equation and result
         equation = "$leftOfCursor$operator$rightOfCursor"
         displayFragment.renderEquation(equation, cursorPosition, 1)
-        displayBedmasResult(equation)
+        calculateBedmasResult(equation)
     }
 
     // Handle equals click
@@ -128,7 +128,7 @@ class ScientificCalculatorFragment : Fragment() {
             // Render equation and result
             equation = "$leftOfCursor$rightOfCursor"
             displayFragment.renderEquation(equation, cursorPosition, 0)
-            displayBedmasResult(equation)
+            calculateBedmasResult(equation)
             return
         } else {
             // Add leading 0 if needed
@@ -138,7 +138,7 @@ class ScientificCalculatorFragment : Fragment() {
             val cursorOffset = if (leadingZeroAdded) 2 else 1
             equation = decimalEquation
             displayFragment.renderEquation(equation, cursorPosition, cursorOffset)
-            displayBedmasResult(equation)
+            calculateBedmasResult(equation)
         }
     }
 
@@ -152,7 +152,7 @@ class ScientificCalculatorFragment : Fragment() {
         // Render equation and result
         equation = equationWithSign
         displayFragment.renderEquation(equation, cursorPosition, cursorOffset)
-        displayBedmasResult(equation)
+        calculateBedmasResult(equation)
     }
 
     // Handle open bracket clicks
@@ -170,7 +170,7 @@ class ScientificCalculatorFragment : Fragment() {
             val multiplication = "×("
             equation = "$leftOfCursor$multiplication$rightOfCursor"
             displayFragment.renderEquation(equation, cursorPosition, 2)
-            displayBedmasResult(equation)
+            calculateBedmasResult(equation)
             return
         }
 
@@ -180,7 +180,7 @@ class ScientificCalculatorFragment : Fragment() {
             val multiplication = "×("
             equation = "$leftOfCursor$multiplication$rightOfCursor"
             displayFragment.renderEquation(equation, cursorPosition, 2)
-            displayBedmasResult(equation)
+            calculateBedmasResult(equation)
             return
         }
 
@@ -188,7 +188,7 @@ class ScientificCalculatorFragment : Fragment() {
         val bracket = "("
         equation = "$leftOfCursor$bracket$rightOfCursor"
         displayFragment.renderEquation(equation, cursorPosition, 1)
-        displayBedmasResult(equation)
+        calculateBedmasResult(equation)
     }
 
     // Handle close bracket clicks
@@ -212,11 +212,11 @@ class ScientificCalculatorFragment : Fragment() {
         val bracket = ")"
         equation = "$leftOfCursor$bracket$rightOfCursor"
         displayFragment.renderEquation(equation, cursorPosition, 1)
-        displayBedmasResult(equation)
+        calculateBedmasResult(equation)
     }
 
     // Get result and show error toast if applicable
-    private fun displayBedmasResult(calcEquation: String) {
+    private fun calculateBedmasResult(calcEquation: String) {
         result = calcUtils.calculateBEDMAS(calcEquation)
         if (result == "error") {
             fragUtils.showToast("Invalid equation", requireContext())
