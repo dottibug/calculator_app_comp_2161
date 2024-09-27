@@ -16,6 +16,7 @@ class SimpleCalculatorFragment : Fragment() {
     private val fragUtils = FragmentUtilities()
     private var equation : String = ""
     private var result : String = ""
+    private var isFinalResult : Boolean = false
 
     // TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateLeftToRight
     //  functions)
@@ -67,6 +68,7 @@ class SimpleCalculatorFragment : Fragment() {
 
     // Handle number clicks
     private fun onNumberClick(number: String) {
+        isFinalResult = false
         val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
 
         // Render equation and result
@@ -77,7 +79,16 @@ class SimpleCalculatorFragment : Fragment() {
 
     // Handle operator clicks
     private fun onOperatorClick(operator: String) {
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
+        if (isFinalResult && result != "error") {
+            equation = "$result$operator"
+            isFinalResult = false
+            displayFragment.renderEquation(equation, equation.length, 0)
+            calculateLeftToRightResult(equation)
+            return
+        }
+
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(
+                displayFragment, equation)
 
         // Prevent user from entering an operator as the first char in the equation
         if (leftOfCursor.isEmpty()) { return }
@@ -91,28 +102,10 @@ class SimpleCalculatorFragment : Fragment() {
         calculateLeftToRightResult(equation)
     }
 
-    // Handle equals click
-    private fun onSimpleEqualClick() {
-        // Show toast message if equation is empty
-        if (equation.isEmpty()) {
-            fragUtils.showToast("Please enter an equation", requireContext())
-            return
-        }
-
-        // If final character of the equation is an operator, show toast message
-        if (equation.last() in setOf('+', '~', '×', '÷')) {
-            fragUtils.showToast("Invalid equation", requireContext())
-            return
-        }
-
-        // Calculate result and render result
-        equation = ""
-        displayFragment.renderEquation(equation, 0, 0)
-        calculateLeftToRightResult(equation)
-    }
-
     // Handle decimal clicks
     private fun onDecimalClick() {
+        isFinalResult = false
+
         val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
         val decimal = "."
 
@@ -138,6 +131,15 @@ class SimpleCalculatorFragment : Fragment() {
 
     // Handle sign clicks
     private fun onSignClick() {
+        if (isFinalResult && result != "error") {
+            if (result.startsWith("-")) equation = result.removePrefix("-")
+            else equation = "-$result"
+            isFinalResult = false
+            displayFragment.renderEquation(equation, equation.length, 0)
+            calculateLeftToRightResult(equation)
+            return
+        }
+
         val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
 
         val (equationWithSign, cursorOffset) = calcUtils.getSimpleEquationWithSign(equation,
@@ -149,19 +151,42 @@ class SimpleCalculatorFragment : Fragment() {
         calculateLeftToRightResult(equation)
     }
 
+    // Handle equals click
+    private fun onSimpleEqualClick() {
+        // Show toast message if equation is empty
+        if (equation.isEmpty()) {
+            fragUtils.showToast("Please enter an equation", requireContext())
+            return
+        }
+
+        // If final character of the equation is an operator, show toast message
+        if (equation.last() in setOf('+', '~', '×', '÷')) {
+            fragUtils.showToast("Invalid equation", requireContext())
+            return
+        }
+
+        isFinalResult = true
+
+        // Calculate result and render result
+        calculateLeftToRightResult(equation)
+        equation = ""
+        displayFragment.renderEquation(equation, 0, 0)
+    }
+
     // Get result and show error toast if applicable
     private fun calculateLeftToRightResult(calcEquation: String) {
         result = calcUtils.calculateLeftToRight(calcEquation)
-        if (result == "error") {
-            fragUtils.showToast("Invalid equation", requireContext())
-        }
-        displayFragment.renderResult(result)
+
+        if (result == "error") { fragUtils.showToast("Invalid equation", requireContext()) }
+        if (isFinalResult) displayFragment.renderFinalResult(result) else displayFragment
+            .renderResult(result)
     }
 
     // Clear equation, result, and display
     private fun onClearClick() {
         equation = ""
         result = ""
+        isFinalResult = false
         displayFragment.renderEquation(equation, 0, 0)
         displayFragment.renderResult(result)
     }

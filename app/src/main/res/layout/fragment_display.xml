@@ -22,7 +22,7 @@
             android:paddingEnd="18dp"
             android:text="@string/result"
             android:textAlignment="viewEnd"
-            android:textColor="@color/jet"
+            android:textColor="@color/slateGray"
             android:textSize="60sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -85,7 +85,6 @@ class CalculatorUtilities {
     // ----------------------------------------------------------------------------------------------
     // Calculates the result of an equation sequentially, from left to right, ignoring BEDMAS order of operations
     fun calculateLeftToRight(equation: String, decimalPlaces: String = "10") : String {
-
         // Guard clause for an empty equation
         if (equation.isEmpty()) return ""
 
@@ -94,14 +93,14 @@ class CalculatorUtilities {
         var result = 0.0
 
         // Iterate through the equation character by character to calculate the result
-        for (char in equation) {
+        for (i in equation.indices) {
             // Handle numbers and decimal points
-            if (char.isDigit() || char == '.' || char == '-') {
-                number += char
+            if (equation[i].isDigit() || equation[i] == '.' || equation[i] == '-') {
+                number += equation[i]
             }
 
             // Handle operators and operation
-            if (char in setOf('+', '~', '×', '÷')) {
+            if (equation[i] in setOf('+', '~', '×', '÷')) {
                 val num = number.toDoubleOrNull() ?: 0.0
                 when (operator) {
                     '+' -> result += num
@@ -109,12 +108,18 @@ class CalculatorUtilities {
                     '×' -> result *= num
                     '÷' -> if (num != 0.0) result /= num else return Double.NaN.toString()
                 }
-                operator = char
+                operator = equation[i]
                 number = ""
             }
         }
 
-        // Calculate with the last number
+        // Return result if the last character is an operator
+        if (equation.last() in setOf('+', '~', '×', '÷')) {
+            val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0').trimEnd('.')
+            return formattedResult
+        }
+
+        // If the last character is not an operator, calculate the final result
         val num = number.toDoubleOrNull() ?: 0.0
         when (operator) {
             '+' -> result += num
@@ -209,8 +214,13 @@ class CalculatorUtilities {
     // NOTE Reference for algorithm: https://brilliant.org/wiki/shunting-yard-algorithm/
     fun calculateBEDMAS(equation: String, decimalPlaces: String = "10") : String {
 
-        val pairedBracketEquation = getEquationWithPairedBrackets(equation)
-        Log.i("testcat", "calculateBEDMAS testEquation: $pairedBracketEquation")
+        var equationToCalculate = equation
+
+        if (equation.last() in setOf('+', '~', '×', '÷')) {
+            equationToCalculate = equation.removeSuffix(equation.last().toString())
+        }
+
+        val pairedBracketEquation = getEquationWithPairedBrackets(equationToCalculate)
 
         if (pairedBracketEquation == "()" || pairedBracketEquation == "(-)" || pairedBracketEquation.endsWith("×(")) {
             return ""}
@@ -294,7 +304,7 @@ class CalculatorUtilities {
         postfix.forEach { token ->
             if (token in setOf("+", "~", "×", "÷")) {
                 // Guard clause to check for at least two numbers in the stack
-                if (stack.size < 2) { return "" }
+                if (stack.size == 1) { return stack[0] }
 
                 // Pop top two numbers from the stack, perform operation, and push result back
                 // onto the stack (the top two numbers are popped in reverse order and removed from

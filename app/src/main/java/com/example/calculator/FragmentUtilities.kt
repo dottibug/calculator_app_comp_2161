@@ -3,7 +3,6 @@ package com.example.calculator
 import android.content.Context
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 
@@ -36,9 +35,8 @@ class FragmentUtilities {
     // ----------------------------------------------------------------------------------------------
     // STYLING FUNCTIONS
     // ----------------------------------------------------------------------------------------------
+    // Color the operators in the equation
     fun highlightOperators(equation: String, context: Context): SpannableString {
-        Log.i("testcat", "equation: $equation")
-
         val spannable = SpannableString(equation)
         val operators = setOf('+', '−', '×', '÷')
 
@@ -51,8 +49,5 @@ class FragmentUtilities {
             }
         }
         return spannable
-
-        // TODO change colors of just the operators. Send that back. With the equation sent back,
-    //      call another function to change ~ to -
     }
 }

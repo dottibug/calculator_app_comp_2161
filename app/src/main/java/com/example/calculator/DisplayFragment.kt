@@ -1,11 +1,16 @@
 package com.example.calculator
 
+import android.content.Context
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.calculator.databinding.FragmentDisplayBinding
 
@@ -54,14 +59,8 @@ class DisplayFragment : Fragment() {
     // Render equation in the EditText
     fun renderEquation(equation: String, cursorPosition: Int, cursorOffset: Int) {
         // Replace ~ in equation with - for the UI    −
-//        val updatedEquation = equation.replace("~", "-")
         val updatedEquation = equation.replace("~", "−")
         val styledEquation = fragUtils.highlightOperators(updatedEquation, requireContext())
-
-//        equationInput.setText(updatedEquation)
-//        equationInput.setSelection(cursorPosition + cursorOffset)
-
-        // TEST
         equationInput.setText(styledEquation)
         equationInput.setSelection(cursorPosition + cursorOffset)
     }
@@ -71,7 +70,23 @@ class DisplayFragment : Fragment() {
         resultView.text = result
     }
 
+    // Render final result (with darker text color) in the TextView
+    fun renderFinalResult(result: String) {
+        Log.i("testcat", "renderFinalResult: $result")
+        val styledResult = colorFinalResult(result, requireContext())
+        Log.i("testcat", "renderFinalResult: $styledResult")
+        resultView.text = styledResult
 
+//        resultView.text = styledResult
+    }
+
+    // Color final result
+    private fun colorFinalResult(result: String, context: Context): SpannableString {
+        val spannable = SpannableString(result)
+        val colorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.jet))
+        spannable.setSpan(colorSpan, 0, result.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannable
+    }
 
     ///////////////// OLD
 
