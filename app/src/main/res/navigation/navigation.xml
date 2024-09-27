@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/simpleModeFragment">
+    <fragment
+        android:id="@+id/simpleModeFragment"
+        android:name="com.example.calculator.SimpleModeFragment"
+        android:label="SimpleModeFragment" >
+        <action
+            android:id="@+id/action_simpleModeFragment_to_scientificModeFragment"
+            app:destination="@id/scientificModeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/scientificModeFragment"
+        android:name="com.example.calculator.ScientificModeFragment"
+        android:label="ScientificModeFragment" >
+        <action
+            android:id="@+id/action_scientificModeFragment_to_simpleModeFragment"
+            app:destination="@id/simpleModeFragment" />
+    </fragment>
+</navigation>

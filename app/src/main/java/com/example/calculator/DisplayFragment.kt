@@ -13,40 +13,77 @@ import com.example.calculator.databinding.FragmentDisplayBinding
 class DisplayFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayBinding
-     private lateinit var equation: EditText
-    private lateinit var result: TextView
+     private lateinit var equationInput: EditText
+    private lateinit var resultView: TextView
+    private val fragUtils = FragmentUtilities()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the dataBinding layout for this fragment
+        // Inflate the layout for this fragment
         binding = FragmentDisplayBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Initialize the equation
-        equation = binding.editViewEquation
-        result = binding.textViewResult
+
+        equationInput = binding.editViewEquation
+        resultView = binding.textViewResult
 
         // Disable keyboard input
-        equation.showSoftInputOnFocus = false
+        equationInput.showSoftInputOnFocus = false
 
         // Set the cursor to the end of the equation
-        equation.requestFocus()
+        equationInput.requestFocus()
     }
 
+    // Get the cursor position in the equation EditText
+    fun getCursorPosition() : Int {
+        return equationInput.selectionStart
+    }
+
+    // Set the cursor position in the equation EditText
+    fun setCursorPosition(position: Int) {
+        if (equationInput.text.isNotEmpty()) {
+            equationInput.setSelection(position)
+        }
+    }
+
+    // Render equation in the EditText
+    fun renderEquation(equation: String, cursorPosition: Int, cursorOffset: Int) {
+        // Replace ~ in equation with - for the UI    −
+//        val updatedEquation = equation.replace("~", "-")
+        val updatedEquation = equation.replace("~", "−")
+        val styledEquation = fragUtils.highlightOperators(updatedEquation, requireContext())
+
+//        equationInput.setText(updatedEquation)
+//        equationInput.setSelection(cursorPosition + cursorOffset)
+
+        // TEST
+        equationInput.setText(styledEquation)
+        equationInput.setSelection(cursorPosition + cursorOffset)
+    }
+
+    // Render result in the TextView
+    fun renderResult(result: String) {
+        resultView.text = result
+    }
+
+
+
+    ///////////////// OLD
+
     fun getEquation() : String {
-        return equation.text.toString()
+        return equationInput.text.toString()
     }
 
     fun displayEquation(newEquation: String) {
         // Replaces ~ in equation string with - in the UI
         val updatedEquation = newEquation.replace("~", "-")
-        equation.setText(updatedEquation)
-        equation.setSelection(updatedEquation.length)
+        equationInput.setText(updatedEquation)
+        equationInput.setSelection(updatedEquation.length)
     }
 
     fun clearDisplay() {
@@ -55,24 +92,15 @@ class DisplayFragment : Fragment() {
     }
 
     private fun clearEquation() {
-        equation.setText("")
+        equationInput.setText("")
     }
 
     fun clearResult() {
-        result.text = ""
+        resultView.text = ""
     }
 
     fun updateResult(newResult: String) {
-        result.text = newResult
+        resultView.text = newResult
     }
 
-    fun getCursorPosition() : Int {
-        return equation.selectionStart
-    }
-
-    fun setCursorPosition(position: Int) {
-        if (equation.text.isNotEmpty()) {
-            equation.setSelection(position)
-        }
-    }
 }

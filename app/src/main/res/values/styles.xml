@@ -1,50 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Main Button Style -->
-    <style name="mainButtonStyle" parent="@style/Widget.Material3.Button.IconButton.Filled.Tonal">
+    <!-- Main Button -->
+    <style name="mainButton" parent="@style/Widget.Material3.Button.IconButton.Filled.Tonal">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:width">64dp</item>
-        <item name="android:height">64dp</item>
         <item name="android:fontFamily">@font/roboto</item>
         <item name="android:textSize">28sp</item>
         <item name="android:includeFontPadding">false</item>
-    </style>
-
-    <!-- Number Button Style -->
-    <style name="numberButtonStyle" parent="mainButtonStyle">
         <item name="android:backgroundTint">@color/platinum</item>
         <item name="android:textColor">@color/jet</item>
     </style>
 
-    <!-- Number Button Style (Night Mode) -->
-    <!-- TODO Add Night Mode -->
+    <!-- SIMPLE CALCULATOR STYLES -->
+    <!-- Simple Calculator Button -->
+    <style name="simpleButton" parent="mainButton">
+        <item name="android:width">64dp</item>
+        <item name="android:height">64dp</item>
+        <item name="android:textSize">28sp</item>
+    </style>
 
-    <!-- Clear Button Style -->
-    <style name="clearButtonStyle" parent="mainButtonStyle">
-        <item name="android:backgroundTint">@color/platinum</item>
+    <!-- Simple Clear Button -->
+    <style name="simpleClearButton" parent="simpleButton">
         <item name="android:textColor">@color/poppy</item>
     </style>
 
-    <!-- Clear Button Style (Night Mode) -->
-    <!-- TODO Add Night Mode -->
-
-    <!-- Operator Button Style -->
-    <style name="operatorStyle" parent="mainButtonStyle">
+    <!-- Simple Operator Button -->
+    <style name="simpleOperator" parent="simpleButton">
         <item name="android:backgroundTint">@color/carolinaBlue</item>
         <item name="android:textColor">@color/seasalt</item>
         <item name="android:textSize">32sp</item>
     </style>
 
+    <!-- Simple Equals Button -->
+    <style name="simpleEquals" parent="simpleOperator">
+        <item name="android:backgroundTint">@color/steelBlue</item>
+        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
+
+    <!-- SCIENTIFIC CALCULATOR STYLES -->
+    <!-- Scientific Calculator Button -->
+    <style name="scientificButton" parent="mainButton">
+        <item name="android:width">60dp</item>
+        <item name="android:height">60dp</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Scientific Clear Button -->
+    <style name="scientificClearButton" parent="scientificButton">
+        <item name="android:textColor">@color/poppy</item>
+    </style>
+
+    <!-- Scientific Operator Button -->
+    <style name="scientificOperator" parent="scientificButton">
+        <item name="android:backgroundTint">@color/carolinaBlue</item>
+        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <!-- Scientific Equals Button -->
+    <style name="scientificEquals" parent="scientificOperator">
+        <item name="android:backgroundTint">@color/steelBlue</item>
+        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+
+<!--    ///////-->
+
+    <!-- Number Button Style (Night Mode) -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Clear Button Style (Night Mode) -->
+    <!-- TODO Add Night Mode -->
+
+    <!-- Operator Button Style -->
     <!-- Operator Button Style (Night Mode) -->
     <!-- TODO Add Night Mode -->
 
     <!-- Equals Button Style -->
-    <style name="equalsStyle" parent="operatorStyle">
-        <item name="android:backgroundTint">@color/steelBlue</item>
-    </style>
-
     <!-- Equals Button Style (Night Mode) -->
     <!-- TODO Add Night Mode -->
 

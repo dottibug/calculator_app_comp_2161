@@ -7,41 +7,23 @@
 
     </data>
 
-    <LinearLayout
-        android:id="@+id/main"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/seasalt"
-        android:orientation="vertical"
         tools:context=".MainActivity">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/displayFragment"
-            android:name="com.example.calculator.DisplayFragment"
+            android:id="@+id/fragmentContainerNavigation"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4" />
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navGraph="@navigation/navigation" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerTools"
-            android:name="com.example.calculator.ToolsFragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerMemory"
-            android:name="com.example.calculator.MemoryFragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerNumbers"
-            android:name="com.example.calculator.NumberPadFragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6" />
-
-    </LinearLayout>
 </layout>

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp") version "2.0.20-1.0.24"
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -49,8 +50,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.common.java8)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
 }

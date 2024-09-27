@@ -40,6 +40,18 @@
     <string name="bracketClose">)</string>
     <string name="bracketOpen">(</string>
 
+    <!-- Scientific Calculator -->
+    <string name="pi">π</string>
+    <string name="squareRoot">√</string>
+    <string name="euler">e</string>
+    <string name="square">x²</string>
+    <string name="sin">sin</string>
+    <string name="cube">x³</string>
+    <string name="cos">cos</string>
+    <string name="absoluteValue">abs</string>
+    <string name="tan">tan</string>
+    <string name="factorial">x!</string>
+
     <!-- Operators -->
     <!-- ( − ) is the mathematical minus sign, not the hyphen symbol -->
     <!-- ( × ) is not the letter x, it is the multiplication symbol -->
