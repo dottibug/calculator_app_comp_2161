@@ -142,7 +142,6 @@ class CalculatorUtilities {
             return Pair(equation, 0)
         }
 
-        Log.i("testcat", "equation: $equation")
         // Start equation with a negative sign if the equation is empty
         if (equation.isEmpty()) { return Pair("-", 1) }
 
@@ -259,6 +258,8 @@ class CalculatorUtilities {
         // Iterate through the matched pattern to create a postfix expression in the correct order
         regex.findAll(equation).forEach { item ->
             val token = item.value
+
+            Log.i("testcat", "token: $token")
 
             when {
                 // --- Number: Push token to the output stack

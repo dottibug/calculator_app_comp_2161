@@ -14,8 +14,8 @@ class SimpleCalculatorFragment : Fragment() {
     private lateinit var displayFragment : DisplayFragment
     private val calcUtils = CalculatorUtilities()
     private val fragUtils = FragmentUtilities()
-    private var equation : String = ""
-    private var result : String = ""
+    var equation : String = ""
+    var result : String = ""
     private var isFinalResult : Boolean = false
 
     // TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateLeftToRight
@@ -175,7 +175,7 @@ class SimpleCalculatorFragment : Fragment() {
 
     // Get result and show error toast if applicable
     private fun calculateLeftToRightResult(calcEquation: String) {
-        result = calcUtils.calculateLeftToRight(calcEquation)
+        if (calcEquation == "-") result = "" else result = calcUtils.calculateLeftToRight(calcEquation)
 
         if (result == "error") { fragUtils.showToast("Invalid equation", requireContext()) }
         if (isFinalResult) displayFragment.renderFinalResult(result) else displayFragment
@@ -189,5 +189,20 @@ class SimpleCalculatorFragment : Fragment() {
         isFinalResult = false
         displayFragment.renderEquation(equation, 0, 0)
         displayFragment.renderResult(result)
+    }
+
+    // Handle backspace click
+    fun onBackspace() {
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
+
+        // Guard clause if cursor is at beginning of equation (nothing to delete)
+        if (cursorPosition == 0) { return }
+
+        // Delete the character at the cursor position
+        val updatedLeftOfCursor = leftOfCursor.dropLast(1)
+
+        equation = "$updatedLeftOfCursor$rightOfCursor"
+        displayFragment.renderEquation(equation, cursorPosition - 1, 0)
+        calculateLeftToRightResult(equation)
     }
 }

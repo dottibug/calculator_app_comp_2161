@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,13 +48,6 @@ class DisplayFragment : Fragment() {
         return equationInput.selectionStart
     }
 
-    // Set the cursor position in the equation EditText
-    fun setCursorPosition(position: Int) {
-        if (equationInput.text.isNotEmpty()) {
-            equationInput.setSelection(position)
-        }
-    }
-
     // Render equation in the EditText
     fun renderEquation(equation: String, cursorPosition: Int, cursorOffset: Int) {
         // Replace ~ in equation with - for the UI    −
@@ -72,12 +64,8 @@ class DisplayFragment : Fragment() {
 
     // Render final result (with darker text color) in the TextView
     fun renderFinalResult(result: String) {
-        Log.i("testcat", "renderFinalResult: $result")
         val styledResult = colorFinalResult(result, requireContext())
-        Log.i("testcat", "renderFinalResult: $styledResult")
         resultView.text = styledResult
-
-//        resultView.text = styledResult
     }
 
     // Color final result
@@ -87,35 +75,4 @@ class DisplayFragment : Fragment() {
         spannable.setSpan(colorSpan, 0, result.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
         return spannable
     }
-
-    ///////////////// OLD
-
-    fun getEquation() : String {
-        return equationInput.text.toString()
-    }
-
-    fun displayEquation(newEquation: String) {
-        // Replaces ~ in equation string with - in the UI
-        val updatedEquation = newEquation.replace("~", "-")
-        equationInput.setText(updatedEquation)
-        equationInput.setSelection(updatedEquation.length)
-    }
-
-    fun clearDisplay() {
-        clearEquation()
-        clearResult()
-    }
-
-    private fun clearEquation() {
-        equationInput.setText("")
-    }
-
-    fun clearResult() {
-        resultView.text = ""
-    }
-
-    fun updateResult(newResult: String) {
-        resultView.text = newResult
-    }
-
 }

@@ -13,8 +13,8 @@ class ScientificCalculatorFragment : Fragment() {
     private lateinit var displayFragment : DisplayFragment
     private val calcUtils = CalculatorUtilities()
     private val fragUtils = FragmentUtilities()
-    private var equation : String = ""
-    private var result : String = ""
+    var equation : String = ""
+    var result : String = ""
     private var isFinalResult : Boolean = false
 
     // TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateBEDMAS
@@ -256,10 +256,9 @@ class ScientificCalculatorFragment : Fragment() {
 
     // Get result and show error toast if applicable
     private fun calculateBedmasResult(calcEquation: String) {
-        result = calcUtils.calculateBEDMAS(calcEquation)
+        if (calcEquation.length == 0) result = "" else result = calcUtils.calculateBEDMAS(calcEquation)
         if (result == "error") { fragUtils.showToast("Invalid equation", requireContext()) }
-        if (isFinalResult) displayFragment.renderFinalResult(result) else displayFragment
-            .renderResult(result)
+        if (isFinalResult) displayFragment.renderFinalResult(result) else displayFragment.renderResult(result)
     }
 
     // Clear equation, result, and display
@@ -268,5 +267,28 @@ class ScientificCalculatorFragment : Fragment() {
         result = ""
         displayFragment.renderEquation(equation, 0, 0)
         displayFragment.renderResult(result)
+    }
+
+    // Handle backspace click
+    fun onBackspace() {
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
+        var updatedLeftOfCursor = leftOfCursor
+        var updatedRightOfCursor = rightOfCursor
+
+        // Guard clause if cursor is at beginning of equation (nothing to delete)
+        if (cursorPosition == 0) { return }
+
+        // Delete the character at the cursor position
+        updatedLeftOfCursor = updatedLeftOfCursor.dropLast(1)
+
+        // If the right of cursor is a decimal, add a leading zero
+        if (updatedRightOfCursor.isNotEmpty() && updatedRightOfCursor.first() == '.' &&
+            updatedLeftOfCursor.last() in setOf('+', '~', '×', '÷')) {
+            updatedRightOfCursor = "0$updatedRightOfCursor"
+        }
+
+        equation = "$updatedLeftOfCursor$updatedRightOfCursor"
+        displayFragment.renderEquation(equation, cursorPosition - 1, 0)
+        calculateBedmasResult(equation)
     }
 }
