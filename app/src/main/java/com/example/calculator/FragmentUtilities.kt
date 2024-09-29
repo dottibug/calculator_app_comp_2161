@@ -19,11 +19,13 @@ class FragmentUtilities {
 
     // Get substring to the left of the cursor
     private fun getLeftOfCursor(cursorPosition: Int, equation: String) : String {
+        if (equation.isEmpty()) return ""
         return equation.substring(0, cursorPosition)
     }
 
     // Get substring to the right of the cursor
     private fun getRightOfCursor(cursorPosition: Int, equation: String) : String {
+        if (equation.isEmpty()) return ""
         return equation.substring(cursorPosition)
     }
 

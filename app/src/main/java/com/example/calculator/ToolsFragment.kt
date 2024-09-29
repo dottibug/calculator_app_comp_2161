@@ -23,7 +23,7 @@ class ToolsFragment : Fragment() {
         // Get the parent activity
         activity = requireActivity() as MainActivity
 
-//        // NavController for navigating between simple and scientific modes
+        // NavController for navigating between simple and scientific modes
         val navController = findNavController()
 
         // Create click listeners

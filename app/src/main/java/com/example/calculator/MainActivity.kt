@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     var isScientificMode : Boolean = false
-    private var memory : String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,29 +42,6 @@ class MainActivity : AppCompatActivity() {
             // Navigate to simple mode
             navController.navigate(ScientificModeFragmentDirections.actionScientificModeFragmentToSimpleModeFragment())
         }
-    }
-
-    ////////////// MEMORY FUNCTIONS //////////////
-    fun onMemoryClear() {
-        // Clear memory to ""
-    }
-
-    fun onMemoryStore() {
-        // Replace memory with new value
-    }
-
-    fun onMemoryRecall() {
-        // Display the number in memory
-    }
-
-    fun onMemoryAdd() {
-    // Take the number in equation (check that it is ONLY a number), add it to the number in
-    // memory, and replace memory with the new value
-    }
-
-    fun onMemorySubtract() {
-        // Take the number in equation (check that it is ONLY a number), subtract it from the number in
-        // memory, and replace memory with the new value
     }
 }
 

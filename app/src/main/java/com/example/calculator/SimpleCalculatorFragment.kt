@@ -12,10 +12,13 @@ import com.example.calculator.databinding.FragmentSimpleCalculatorBinding
 class SimpleCalculatorFragment : Fragment() {
     private lateinit var binding : FragmentSimpleCalculatorBinding
     private lateinit var displayFragment : DisplayFragment
+    private lateinit var memoryFragment : MemoryFragment
     private val calcUtils = CalculatorUtilities()
     private val fragUtils = FragmentUtilities()
+    private val memoryUtils = MemoryUtilities()
     var equation : String = ""
     var result : String = ""
+    var memory : String = ""
     private var isFinalResult : Boolean = false
 
     // TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateLeftToRight
@@ -62,18 +65,28 @@ class SimpleCalculatorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Get the display fragment
         displayFragment = parentFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
+        memoryFragment = parentFragmentManager.findFragmentById(R.id.memoryFragment) as MemoryFragment
     }
 
     // Handle number clicks
     private fun onNumberClick(number: String) {
+        if (isFinalResult) equation = ""
+
         isFinalResult = false
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
+        var cursorOffset = 1
+        var (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
 
         // Render equation and result
         equation = "$leftOfCursor$number$rightOfCursor"
-        displayFragment.renderEquation(equation, cursorPosition, 1)
+
+        // Handles cursor position and offset when a number is clicked while isFinalResult was true
+        if (equation.length == 1) {
+            cursorPosition = 1
+            cursorOffset = 0
+        }
+
+        displayFragment.renderEquation(equation, cursorPosition, cursorOffset)
         calculateLeftToRightResult(equation)
     }
 
@@ -96,6 +109,14 @@ class SimpleCalculatorFragment : Fragment() {
         // Prevent user from entering two operators in a row
         if (calcUtils.hasDoubleOperators(leftOfCursor, rightOfCursor)) { return }
 
+        // Add trailing 0 if user enters operator beside a decimal
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '.' && rightOfCursor.isEmpty()) {
+            val zero = "0"
+            equation = "$leftOfCursor$zero$operator"
+            displayFragment.renderEquation(equation, cursorPosition, 2)
+            return
+        }
+
         // Update equation and render equation
         equation = "$leftOfCursor$operator$rightOfCursor"
         displayFragment.renderEquation(equation, cursorPosition, 1)
@@ -104,17 +125,23 @@ class SimpleCalculatorFragment : Fragment() {
 
     // Handle decimal clicks
     private fun onDecimalClick() {
+        val decimal = "."
+        if (isFinalResult) {
+            if (result.contains('.')) return
+            else equation = "$result$decimal"
+        }
+
         isFinalResult = false
+        var cursorOffset = 0
 
         val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
-        val decimal = "."
 
         // Prevent user from entering numbers with more than one decimal
         val testEquation = "$leftOfCursor$decimal$rightOfCursor"
 
         if (calcUtils.hasInvalidDecimal(testEquation)) {
             equation = "$leftOfCursor$rightOfCursor"
-            displayFragment.renderEquation(equation, cursorPosition, 0)
+            displayFragment.renderEquation(equation, cursorPosition, cursorOffset)
             calculateLeftToRightResult(equation)
             return
         } else {
@@ -122,7 +149,7 @@ class SimpleCalculatorFragment : Fragment() {
             val (decimalEquation, leadingZeroAdded) = calcUtils.getEquationWithDecimal(leftOfCursor, rightOfCursor)
 
             // Render equation and result
-            val cursorOffset = if (leadingZeroAdded) 2 else 1
+            cursorOffset = if (leadingZeroAdded) 2 else 1
             equation = decimalEquation
             displayFragment.renderEquation(equation, cursorPosition, cursorOffset)
             calculateLeftToRightResult(equation)
@@ -166,11 +193,7 @@ class SimpleCalculatorFragment : Fragment() {
         }
 
         isFinalResult = true
-
-        // Calculate result and render result
         calculateLeftToRightResult(equation)
-        equation = ""
-        displayFragment.renderEquation(equation, 0, 0)
     }
 
     // Get result and show error toast if applicable
@@ -205,4 +228,149 @@ class SimpleCalculatorFragment : Fragment() {
         displayFragment.renderEquation(equation, cursorPosition - 1, 0)
         calculateLeftToRightResult(equation)
     }
+
+    // MEMORY FUNCTIONS //
+    fun onMemStore() {
+        var number = equation
+
+        if (equation.isEmpty() && result.isEmpty()) { return }
+
+        // Set isFinalResult to true so the result is rendered in the darker color
+        if (isFinalResult) number = result
+
+        // Set isFinalResult to true to ...
+        isFinalResult = true
+
+        val isValidNumber = memoryUtils.isNumber(number)
+        if (isValidNumber) {
+            memory = memoryUtils.getSimpleNumber(number)
+            fragUtils.showToast("Memory updated", requireContext())
+            calculateLeftToRightResult(number)
+        }
+        else fragUtils.showToast("Memory can only store numbers", requireContext())
+    }
+
+    fun onMemRecall() {
+        isFinalResult = false
+
+        if (memory.isEmpty()) {
+            fragUtils.showToast("Memory is empty", requireContext())
+            return
+        }
+
+        if (equation.isNotEmpty()) {
+            if (equation.last() in setOf('+', '~', '×', '÷', '.')) {
+                equation = "${equation.dropLast(1)}+$memory"
+            } else {
+                equation = "$equation+$memory"
+            }
+
+            displayFragment.renderEquation(equation, equation.length, 0)
+            calculateLeftToRightResult(equation)
+            return
+        }
+
+        equation = memory
+        fragUtils.showToast("Memory recalled", requireContext())
+        displayFragment.renderEquation(equation, equation.length, 0)
+        calculateLeftToRightResult(equation)
+    }
+
+    fun onMemAdd() {
+        if (memory.isEmpty()) {
+            fragUtils.showToast("Memory is empty", requireContext())
+            return
+        }
+
+        // If equation and result are empty, but memory is not, start an equation with memory num
+        if (equation.isEmpty() && result.isEmpty() && memory.isNotEmpty()) {
+            isFinalResult = false
+            equation = memory
+            displayFragment.renderEquation(equation, equation.length, 0)
+            calculateLeftToRightResult(equation)
+            return
+        }
+
+        // If a final result is displayed, add memory num to the result
+        if (isFinalResult) {
+            equation = "$result+$memory"
+            isFinalResult = true
+            displayFragment.renderEquation(equation, equation.length, 0)
+            calculateLeftToRightResult(equation)
+            memory = result
+            fragUtils.showToast("Memory updated", requireContext())
+            return
+        }
+
+        // If equation is not empty, add memory num to the end of the equation
+        isFinalResult = false
+        var number = equation
+        val isValidNumber = memoryUtils.isNumber(number)
+
+        if (isValidNumber) {
+            val simpleNumber = memoryUtils.getSimpleNumber(number)
+            equation = "$simpleNumber+$memory"
+            displayFragment.renderEquation(equation, equation.length, 0)
+
+            // Update memory
+            isFinalResult = true
+            calculateLeftToRightResult(equation)
+            memory = result
+            fragUtils.showToast("Memory updated", requireContext())
+        }
+        else fragUtils.showToast("Memory can only store numbers", requireContext())
+    }
+
+    fun onMemSubtract() {
+        if (memory.isEmpty()) {
+            fragUtils.showToast("Memory is empty", requireContext())
+            return
+        }
+
+        // If equation and result are empty, but memory is not, start an equation with memory num
+        if (equation.isEmpty() && result.isEmpty() && memory.isNotEmpty()) {
+            isFinalResult = false
+            equation = memory
+            displayFragment.renderEquation(equation, equation.length, 0)
+            calculateLeftToRightResult(equation)
+            return
+        }
+
+        // If a final result is displayed, subtract memory num from the result
+        if (isFinalResult) {
+            equation = "$result~$memory"
+            isFinalResult = true
+            displayFragment.renderEquation(equation, equation.length, 0)
+            calculateLeftToRightResult(equation)
+            memory = result
+            fragUtils.showToast("Memory updated", requireContext())
+            return
+        }
+
+        // If equation is not empty, subtract memory num from the end of the equation
+        isFinalResult = false
+        var number = equation
+        val isValidNumber = memoryUtils.isNumber(number)
+
+        if (isValidNumber) {
+            val simpleNumber = memoryUtils.getSimpleNumber(number)
+            equation = "$simpleNumber~$memory"
+            displayFragment.renderEquation(equation, equation.length, 0)
+
+            // Update memory
+            isFinalResult = true
+            calculateLeftToRightResult(equation)
+            memory = result
+            fragUtils.showToast("Memory updated", requireContext())
+        }
+        else fragUtils.showToast("Memory can only store numbers", requireContext())
+    }
+
+    fun onMemClear() {
+        isFinalResult = false
+        memory = ""
+        fragUtils.showToast("Memory cleared", requireContext())
+    }
+
+
 }
