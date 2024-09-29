@@ -9,17 +9,17 @@ import com.example.calculator.databinding.FragmentSimpleCalculatorBinding
 
 // NOTE: The simple calculator calculates the result of an equation sequentially, from left to
 //  right, ignoring BEDMAS order of operations
-class SimpleCalculatorFragment : Fragment() {
+class SimpleCalculatorFragment : CalculatorFragment() {
     private lateinit var binding : FragmentSimpleCalculatorBinding
-    private lateinit var displayFragment : DisplayFragment
-    private lateinit var memoryFragment : MemoryFragment
-    private val calcUtils = CalculatorUtilities()
-    private val fragUtils = FragmentUtilities()
-    private val memoryUtils = MemoryUtilities()
-    var equation : String = ""
-    var result : String = ""
-    var memory : String = ""
-    private var isFinalResult : Boolean = false
+//    private lateinit var displayFragment : DisplayFragment
+//    private lateinit var memoryFragment : MemoryFragment
+//    private val calcUtils = CalculatorUtilities()
+//    private val fragUtils = FragmentUtilities()
+//    private val memoryUtils = MemoryUtilities()
+//    var equation : String = ""
+//    var result : String = ""
+//    var memory : String = ""
+//    private var isFinalResult : Boolean = false
 
     // TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateLeftToRight
     //  functions)
@@ -69,26 +69,29 @@ class SimpleCalculatorFragment : Fragment() {
         memoryFragment = parentFragmentManager.findFragmentById(R.id.memoryFragment) as MemoryFragment
     }
 
-    // Handle number clicks
-    private fun onNumberClick(number: String) {
-        if (isFinalResult) equation = ""
 
-        isFinalResult = false
-        var cursorOffset = 1
-        var (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
+    /////////////////////////////////
 
-        // Render equation and result
-        equation = "$leftOfCursor$number$rightOfCursor"
-
-        // Handles cursor position and offset when a number is clicked while isFinalResult was true
-        if (equation.length == 1) {
-            cursorPosition = 1
-            cursorOffset = 0
-        }
-
-        displayFragment.renderEquation(equation, cursorPosition, cursorOffset)
-        calculateLeftToRightResult(equation)
-    }
+//    // Handle number clicks
+//    private fun onNumberClick(number: String) {
+//        if (isFinalResult) equation = ""
+//
+//        isFinalResult = false
+//        var cursorOffset = 1
+//        var (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getEquationParts(displayFragment, equation)
+//
+//        // Render equation and result
+//        equation = "$leftOfCursor$number$rightOfCursor"
+//
+//        // Handles cursor position and offset when a number is clicked while isFinalResult was true
+//        if (equation.length == 1) {
+//            cursorPosition = 1
+//            cursorOffset = 0
+//        }
+//
+//        displayFragment.renderEquation(equation, cursorPosition, cursorOffset)
+//        calculateLeftToRightResult(equation)
+//    }
 
     // Handle operator clicks
     private fun onOperatorClick(operator: String) {
