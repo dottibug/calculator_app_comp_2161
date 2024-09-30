@@ -1,6 +1,6 @@
 package com.example.calculator
 
-import android.util.Log
+import android.content.Context
 import androidx.fragment.app.Fragment
 import java.util.Locale
 
@@ -19,14 +19,15 @@ abstract class CalculatorFragment : Fragment() {
     // Calculate and render the result in the display fragment. Simple mode uses sequential
     // calculation from left to right, ignoring BEDMAS order of operations. Scientific mode takes
     // BEDMAS order of operations into account.
-    protected fun calculate(exp : String, mode : String) {
+    protected fun calculate(exp : String, mode : String, context: Context) {
         if (mode == "simple") {
-            result = if (exp == "-") "" else calcUtils.calculateLeftToRight(exp)
+            if (exp == "-") return
+            result = if (exp.isEmpty()) "" else calcUtils.calculateLeftToRight(exp)
         }
 
         if (mode == "scientific") {
-            result = if (exp.isEmpty()) "" else calcUtils.calculateBEDMAS(exp)
-            Log.i("testcat", "result: $result")
+            if (exp == "(-" || exp == "abs((-" || exp == "(") return
+            result = if (exp.isEmpty()) "" else calcUtils.calculateBEDMAS(exp, context)
         }
 
         if (result == "error") {
@@ -63,7 +64,6 @@ abstract class CalculatorFragment : Fragment() {
         if (formattedNumber.contains(".")) {
             // Count digits of the unformatted number (we need to ignore the specified decimal
             // places to accurately count the number of digits)
-            Log.i("testcat", "number is $number")
             for (char in number) {
                 if (char.isDigit()) digitCount++
             }
@@ -81,7 +81,7 @@ abstract class CalculatorFragment : Fragment() {
     protected fun renderExpressionAndResult(exp: String, cursorPosition: Int, cursorOffset: Int,
                                             mode: String) {
         displayFragment.renderExpression(exp, cursorPosition, cursorOffset)
-        calculate(exp, mode)
+        calculate(exp, mode, requireContext())
     }
 
     // Handle number clicks
@@ -214,7 +214,7 @@ abstract class CalculatorFragment : Fragment() {
         }
 
         isFinalResult = true
-        calculate(expression, mode)
+        calculate(expression, mode, requireContext())
     }
 
     // Clear equation, result, and display
@@ -242,7 +242,7 @@ abstract class CalculatorFragment : Fragment() {
         if (isValidNumber) {
             memory = memoryUtils.getScientificNumber(number)
             fragUtils.showToast(requireContext(), "Memory updated")
-            calculate(number, mode)
+            calculate(number, mode, requireContext())
         }
         else fragUtils.showToast(requireContext(), "Memory can only store numbers")
     }

@@ -1,9 +1,12 @@
 package com.example.calculator
 
-import android.util.Log
+import android.content.Context
 import java.lang.Math.toRadians
+import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.math.tan
 import kotlin.reflect.KFunction2
 
@@ -217,7 +220,7 @@ class CalculatorUtilities {
     // Calculate the result of the equation using BEDMAS order of operations
     // Use the shunting-yard algorithm to calculate the result of the equation
     // NOTE Reference for algorithm: https://brilliant.org/wiki/shunting-yard-algorithm/
-    fun calculateBEDMAS(equation: String) : String {
+    fun calculateBEDMAS(equation: String, context: Context) : String {
         var equationToCalculate = equation
 
         if (equation.last() in setOf('+', '~', '×', '÷')) {
@@ -229,9 +232,7 @@ class CalculatorUtilities {
         if (pairedBracketEquation == "()" || pairedBracketEquation == "(-)" || pairedBracketEquation.endsWith("×(")) {
             return ""}
 
-        // test
-        val postfixExpression = getPostfixExpression(pairedBracketEquation)
-        Log.i("testcat", "postfixExpression: $postfixExpression")
+        val postfixExpression = getPostfixExpression(pairedBracketEquation, context)
 
         // Check for an empty postfix expression (return error if empty)
         if (postfixExpression.isEmpty()) { return "error" }
@@ -248,14 +249,18 @@ class CalculatorUtilities {
         // bracket to the equation to prevent a mismatched brackets error
         val openBracketCount = equation.count { it == '(' }
         val closeBracketCount = equation.count { it == ')' }
-        if (openBracketCount > closeBracketCount) { return "$equation)" }
-        if (closeBracketCount > openBracketCount) { return "error" }
+        if (openBracketCount > closeBracketCount) {
+            val missingBrackets = openBracketCount - closeBracketCount
+            return equation + ")".repeat(missingBrackets)
+        } else if (closeBracketCount > openBracketCount) {
+            return "error"
+        }
         return equation
     }
 
     // Get the postfix expression of the equation
     // NOTE: × is not the letter x, it is the multiplication symbol
-    private fun getPostfixExpression(expression: String) : MutableList<String> {
+    private fun getPostfixExpression(expression: String, context: Context) : MutableList<String> {
         val output : MutableList<String> = mutableListOf()
         val operators : MutableList<String> = mutableListOf()
 
@@ -276,14 +281,40 @@ class CalculatorUtilities {
         // Handle trig functions
         // if expression contains "sin", "cos", or "tan"
         // replace it with the correct value
-
         if (expressionToParse.contains("sin") || (expressionToParse.contains("cos")) ||
             (expressionToParse.contains("tan"))) {
             expressionToParse = calculateTrigFunctions(expressionToParse)
-            Log.i("testcat", "expressionToParse: $expressionToParse")
+            if (expressionToParse == "error") { return mutableListOf()}
+        }
+
+        // Handle square root
+        if (expressionToParse.contains("√")) {
+            expressionToParse = calculateSquareRoot(expressionToParse, context)
+            if (expressionToParse == "error") { return mutableListOf()}
+        }
+
+        if (expressionToParse.contains("^")) {
+
+            if (expressionToParse.contains("^(2)"))
+            expressionToParse = calculateExponent(expressionToParse, "square")
+
+            if (expressionToParse.contains("^(3)"))
+            expressionToParse = calculateExponent(expressionToParse, "cube")
 
             if (expressionToParse == "error") { return mutableListOf()}
         }
+
+        if (expressionToParse.contains("abs")) {
+            expressionToParse = calculateAbs(expressionToParse)
+            if (expressionToParse == "error") { return mutableListOf() }
+        }
+
+
+        if (expressionToParse.contains("!")) {
+            expressionToParse = calculateFactorial(expressionToParse)
+            if (expressionToParse == "error") { return mutableListOf() }
+        }
+
 
         // Parses numbers, operators, and brackets, matching optional negative sign and/or decimal
         val regex = Regex("(-?[0-9]+\\.?[0-9]*)|([+~×÷()])")
@@ -381,6 +412,9 @@ class CalculatorUtilities {
     fun getScientificEquationWithSign(equation: String, leftOfCursor: String, rightOfCursor:
     String, cursorPosition: Int) : Pair<String, Int> {
 
+        // Start equation with a negative sign if the equation is empty
+        if (equation.isEmpty()) { return Pair("(-", 2) }
+
         // Prevent user from entering a negative sign at the end of an equation if the preceding
         // character is a digit or a closed bracket
         if (rightOfCursor.isEmpty() && leftOfCursor.isNotEmpty() && (leftOfCursor.last().isDigit
@@ -388,8 +422,6 @@ class CalculatorUtilities {
             return Pair(equation, 0)
         }
 
-        // Start equation with a negative sign if the equation is empty
-        if (equation.isEmpty()) { return Pair("(-", 2) }
 
         // Remove negative sign if the equation is only a negative sign
         if (equation == "(-") { return Pair("", -2) }
@@ -399,6 +431,13 @@ class CalculatorUtilities {
             val negativeSign = "-"
             val equationWithSign = "$equation$negativeSign"
             return Pair(equationWithSign, 1)
+        }
+
+        // Handle if left is abs
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.endsWith("abs(")) {
+            val negativeSign = "(-"
+            val equationWithSign = "$leftOfCursor$negativeSign$rightOfCursor"
+            return Pair(equationWithSign, 2)
         }
 
         // Toggle negative sign if the equation is only a number (ie. it does not have operators)
@@ -476,7 +515,7 @@ class CalculatorUtilities {
     }
 
     // ----------------------------------------------------------------------------------------------
-    // TRIG FUNCTIONS
+    // SCIENTIFIC FUNCTIONS
     // ----------------------------------------------------------------------------------------------
     private fun calculateTrigFunctions(expression: String) : String {
         val trigRegex = Regex("""(sin|cos|tan)\(\d+(\.\d+)?\)""")
@@ -505,8 +544,144 @@ class CalculatorUtilities {
             }
             // Format the result to 4 decimal places
             val formattedResult = "%.4f".format(result)
+
+            // Replace the trig function substring with the result
             modifiedExpression = modifiedExpression.replace(trigFunction, formattedResult)
         }
         return modifiedExpression
+    }
+
+    private fun calculateSquareRoot(expression: String, context: Context) : String {
+
+        if (expression.contains(Regex("[+~×÷]"))) {
+            fragUtils.showToast(context, "Enter a number for the radicand")
+        }
+
+        val squareRootRegex = Regex("""√\((\d+(\.\d+)?)\)""")
+        val numberRegex = Regex("-?\\d+(\\.\\d+)?")
+
+        var modifiedExpression = expression
+
+        val squareRoots = squareRootRegex.findAll(expression).toList()
+
+        if (squareRoots.toList().isEmpty()) { return "error" }
+
+        squareRoots.forEach {
+            val squareRoot = it.value
+            val number = numberRegex.find(squareRoot)?.value ?: ""
+
+            // If there is no number, return error
+            if (number.isEmpty()) { return "error" }
+
+            // If the number is negative, return error
+            if (number.toDouble() < 0) { return "error" }
+
+            val result = sqrt(number.toDouble())
+
+            // Format the result to 4 decimal places
+            val formattedResult = "%.4f".format(result)
+
+            // Replace the square root substring with the result
+            modifiedExpression = modifiedExpression.replace(squareRoot, formattedResult)
+        }
+        return modifiedExpression
+    }
+
+    private fun calculateExponent(expression: String, exponent: String) : String {
+        val exponentRegex = Regex("""-?\d+(?:\.\d+)?\^\(\d+\)""")
+        val baseRegex = Regex(""".*(?=\^)""")
+
+        var modifiedExpression = expression
+
+        val exponents = exponentRegex.findAll(expression)
+        if (exponents.toList().isEmpty()) { return "error" }
+
+        exponents.forEach {
+            val exponentExpression = it.value
+            val base = baseRegex.find(exponentExpression)?.value ?: ""
+
+            var result = ""
+            when {
+                exponent == "square" -> {
+                result = base.toDouble().pow(2).toString()
+                }
+                exponent == "cube" -> {
+                    result = base.toDouble().pow(3).toString()
+                }
+            }
+
+            val formattedResult = "%.4f".format(result.toDouble())
+            modifiedExpression = modifiedExpression.replace(exponentExpression, formattedResult)
+        }
+        return modifiedExpression
+    }
+
+    private fun calculateAbs(expression: String) : String {
+        val absRegex = Regex("abs\\((([^()]*)|(\\([^()]*\\)))\\)")
+        val numberRegex = Regex("-?\\d+(\\.\\d+)?")
+
+        var modifiedExpression = expression
+
+        val absoluteValues = absRegex.findAll(expression)
+        if (absoluteValues.toList().isEmpty()) { return "error" }
+
+        absoluteValues.forEach {
+            val absExpression = it.value
+            val number = numberRegex.find(absExpression)?.value ?: ""
+
+            // If there is no number, return error
+            if (number.isEmpty()) { return "error" }
+
+            val result = abs(number.toDouble())
+
+            // Format the result to 4 decimal places
+            val formattedResult = "%.4f".format(result)
+
+            // Replace the absolute value substring with the result
+            modifiedExpression = modifiedExpression.replace(absExpression, formattedResult)
+        }
+        return modifiedExpression
+    }
+
+    private fun calculateFactorial(expression: String) : String {
+        val factorialRegex = Regex("-?\\d+!")
+        val numberRegex = Regex("-?\\d+")
+
+        var modifiedExpression = expression
+
+        val factorials = factorialRegex.findAll(expression)
+        if (factorials.toList().isEmpty()) { return "error" }
+
+        var result = ""
+        factorials.forEach {
+            val factorialExpression = it.value
+            val number = numberRegex.find(factorialExpression)?.value ?: ""
+
+            // If there is no number, return error
+            if (number.isEmpty()) { return "error" }
+
+            // If the number is a decimal, return error
+            if (number.contains(".")) { return "error" }
+
+            // If the number is negative, calculate positive factorial then add negative sign back
+            if (number.toDouble() < 0) {
+                val nonNegNum = number.toInt() * -1
+                result = "-${factorial(nonNegNum)}"
+            } else {
+                result = factorial(number.toInt())
+            }
+
+            // Replace the factorial substring with the result
+            modifiedExpression = modifiedExpression.replace(factorialExpression, result)
+        }
+        return modifiedExpression
+    }
+
+    private fun factorial(number: Int) : String {
+        var result = 1
+        for (i in 1..number) {
+            result *= i
+        }
+        return result.toString()
     }
 }

@@ -104,13 +104,13 @@
             android:text="@string/euler"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/buttonSqure"
+            app:layout_constraintEnd_toStartOf="@+id/buttonSquare"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonPi" />
 
         <Button
-            android:id="@+id/buttonSqure"
+            android:id="@+id/buttonSquare"
             style="@style/scientificButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -126,11 +126,11 @@
             android:id="@+id/button7"
             style="@style/scientificButton"
             android:text="@string/n7"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonSqure"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonSquare"
             app:layout_constraintEnd_toStartOf="@+id/button8"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonSqure"
-            app:layout_constraintTop_toTopOf="@+id/buttonSqure" />
+            app:layout_constraintStart_toEndOf="@+id/buttonSquare"
+            app:layout_constraintTop_toTopOf="@+id/buttonSquare" />
 
         <Button
             android:id="@+id/button8"

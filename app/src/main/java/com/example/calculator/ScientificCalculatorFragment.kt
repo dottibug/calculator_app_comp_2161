@@ -59,6 +59,11 @@ class ScientificCalculatorFragment : CalculatorFragment() {
         binding.buttonSin.setOnClickListener { onTrigClick("sin") }
         binding.buttonCos.setOnClickListener { onTrigClick("cos") }
         binding.buttonTan.setOnClickListener { onTrigClick("tan") }
+        binding.buttonSquareRoot.setOnClickListener { onSquareRootClick() }
+        binding.buttonSquare.setOnClickListener { onExponentClick("square") }
+        binding.buttonCube.setOnClickListener { onExponentClick("cube") }
+        binding.buttonAbs.setOnClickListener { onAbsClick() }
+        binding.buttonFactorial.setOnClickListener { onFactorialClick() }
 
         return binding.root
     }
@@ -208,5 +213,73 @@ class ScientificCalculatorFragment : CalculatorFragment() {
             expression = "$leftOfCursor$trigSymbol$rightOfCursor"
         }
         displayFragment.renderExpression(expression, expression.length, 0)
+    }
+
+    // Handle square root click
+    private fun onSquareRootClick() {
+        var squareRoot = "√("
+        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
+
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last().isDigit()) {
+            expression = "$leftOfCursor×$squareRoot$rightOfCursor"
+        } else {
+            expression = "$leftOfCursor$squareRoot$rightOfCursor"
+        }
+        displayFragment.renderExpression(expression, expression.length, 0)
+    }
+
+    // Handle exponent click
+    private fun onExponentClick(exponent: String) {
+        if (expression.isEmpty()) { return }
+
+        var exponentSymbol = ""
+
+        when (exponent) {
+            "square" -> exponentSymbol = "^(2)"
+            "cube" -> exponentSymbol = "^(3)"
+        }
+
+        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
+
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷')) {
+            return
+        } else {
+            expression = "$leftOfCursor$exponentSymbol$rightOfCursor"
+        }
+
+        renderExpressionAndResult(expression, expression.length, 0, mode)
+    }
+
+
+    // Handle absolute value click
+    private fun onAbsClick() {
+        var abs = "abs("
+
+        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
+
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last().isDigit()) {
+            expression = "$leftOfCursor×$abs$rightOfCursor"
+        } else {
+            expression = "$leftOfCursor$abs$rightOfCursor"
+        }
+
+        displayFragment.renderExpression(expression, expression.length, 0)
+    }
+
+    // Handle factorial click
+    private fun onFactorialClick() {
+        if (expression.isEmpty()) { return }
+
+        var factorial = "!"
+
+        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
+
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷')) {
+            return
+        } else {
+            expression = "$leftOfCursor$factorial$rightOfCursor"
+        }
+
+        renderExpressionAndResult(expression, expression.length, 0, mode)
     }
 }

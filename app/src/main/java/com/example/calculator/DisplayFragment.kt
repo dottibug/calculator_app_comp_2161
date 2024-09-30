@@ -39,7 +39,9 @@ class DisplayFragment : Fragment() {
         resultView = binding.textViewResult
 
         expressionInput.showSoftInputOnFocus = false
-        expressionInput.requestFocus()
+        // BUG The keyboard keeps opening when we request focus on the EditText multiline
+//        expressionInput.requestFocus()
+        imm.hideSoftInputFromWindow(expressionInput.windowToken, 0)
     }
 
     // Get the cursor position in the equation EditText
