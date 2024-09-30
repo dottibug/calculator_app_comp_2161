@@ -1,10 +1,17 @@
 package com.example.calculator
 
+import android.util.Log
+import java.lang.Math.toRadians
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.tan
 import kotlin.reflect.KFunction2
 
 // Common utilities shared between the simple and scientific calculator fragments
 class CalculatorUtilities {
     private val fragUtils = FragmentUtilities()
+    private val piValue = 3.1415
+    private val euler = 2.7182
 
     // ----------------------------------------------------------------------------------------------
     // CLICK LISTENERS
@@ -128,8 +135,6 @@ class CalculatorUtilities {
             '÷' -> if (num != 0.0) result /= num else return Double.NaN.toString()
         }
 
-//        val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0').trimEnd('.')
-//        return formattedResult
         return result.toString()
     }
 
@@ -213,7 +218,6 @@ class CalculatorUtilities {
     // Use the shunting-yard algorithm to calculate the result of the equation
     // NOTE Reference for algorithm: https://brilliant.org/wiki/shunting-yard-algorithm/
     fun calculateBEDMAS(equation: String) : String {
-
         var equationToCalculate = equation
 
         if (equation.last() in setOf('+', '~', '×', '÷')) {
@@ -225,7 +229,9 @@ class CalculatorUtilities {
         if (pairedBracketEquation == "()" || pairedBracketEquation == "(-)" || pairedBracketEquation.endsWith("×(")) {
             return ""}
 
+        // test
         val postfixExpression = getPostfixExpression(pairedBracketEquation)
+        Log.i("testcat", "postfixExpression: $postfixExpression")
 
         // Check for an empty postfix expression (return error if empty)
         if (postfixExpression.isEmpty()) { return "error" }
@@ -249,15 +255,41 @@ class CalculatorUtilities {
 
     // Get the postfix expression of the equation
     // NOTE: × is not the letter x, it is the multiplication symbol
-    private fun getPostfixExpression(equation: String) : MutableList<String> {
+    private fun getPostfixExpression(expression: String) : MutableList<String> {
         val output : MutableList<String> = mutableListOf()
         val operators : MutableList<String> = mutableListOf()
+
+        var expressionToParse = expression
+
+        // TODO a function that replaces pi and euler and other symbols with their values and
+        //  returns an expression
+        // If the equation contains pi symbol, replace it with the correct value
+        if (expressionToParse.contains("π")) {
+            expressionToParse = expressionToParse.replace("π", piValue.toString())
+        }
+
+        // If the equation contains euler symbol, replace it with the correct value
+        if (expressionToParse.contains("e")) {
+            expressionToParse = expressionToParse.replace("e", euler.toString())
+        }
+
+        // Handle trig functions
+        // if expression contains "sin", "cos", or "tan"
+        // replace it with the correct value
+
+        if (expressionToParse.contains("sin") || (expressionToParse.contains("cos")) ||
+            (expressionToParse.contains("tan"))) {
+            expressionToParse = calculateTrigFunctions(expressionToParse)
+            Log.i("testcat", "expressionToParse: $expressionToParse")
+
+            if (expressionToParse == "error") { return mutableListOf()}
+        }
 
         // Parses numbers, operators, and brackets, matching optional negative sign and/or decimal
         val regex = Regex("(-?[0-9]+\\.?[0-9]*)|([+~×÷()])")
 
         // Iterate through the matched pattern to create a postfix expression in the correct order
-        regex.findAll(equation).forEach { item ->
+        regex.findAll(expressionToParse).forEach { item ->
             val token = item.value
 
             when {
@@ -331,9 +363,6 @@ class CalculatorUtilities {
         // Return formatted result to the specified number of decimal places
         if (stack.size == 1) {
             val result = stack.last().toDouble()
-//            val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0')
-//                .trimEnd('.')
-//            return formattedResult
             return result.toString()
         } else { return "error" }
     }
@@ -444,5 +473,40 @@ class CalculatorUtilities {
             }
         }
         return Pair("", 0)
+    }
+
+    // ----------------------------------------------------------------------------------------------
+    // TRIG FUNCTIONS
+    // ----------------------------------------------------------------------------------------------
+    private fun calculateTrigFunctions(expression: String) : String {
+        val trigRegex = Regex("""(sin|cos|tan)\(\d+(\.\d+)?\)""")
+        val numberRegex = Regex("""\d+(\.\d+)?""")
+
+        var modifiedExpression = expression
+
+        val trigFunctions = trigRegex.findAll(expression)
+        if (trigFunctions.toList().isEmpty()) { return "error" }
+
+        trigFunctions.forEach {
+            val trigFunction = it.value
+            val number = numberRegex.find(trigFunction)?.value ?: ""
+
+            // If there is no number, return error
+            if (number.isEmpty()) { return "error" }
+
+            // Convert to radians (kotlin math library uses radians)
+            val radians = toRadians(number.toDouble())
+
+            val result = when {
+                trigFunction.startsWith("sin") -> sin(radians)
+                trigFunction.startsWith("cos") -> cos(radians)
+                trigFunction.startsWith("tan") -> tan(radians)
+                else -> 0.0
+            }
+            // Format the result to 4 decimal places
+            val formattedResult = "%.4f".format(result)
+            modifiedExpression = modifiedExpression.replace(trigFunction, formattedResult)
+        }
+        return modifiedExpression
     }
 }

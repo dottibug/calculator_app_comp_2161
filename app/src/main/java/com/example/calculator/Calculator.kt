@@ -26,10 +26,12 @@ abstract class CalculatorFragment : Fragment() {
 
         if (mode == "scientific") {
             result = if (exp.isEmpty()) "" else calcUtils.calculateBEDMAS(exp)
+            Log.i("testcat", "result: $result")
         }
 
         if (result == "error") {
             fragUtils.showToast(requireContext(), "Invalid expression")
+            return
         }
 
         // Check if the result has more than 12 digits
@@ -49,7 +51,7 @@ abstract class CalculatorFragment : Fragment() {
         else { displayFragment.renderResult(result) }
     }
 
-    // Count the number of digits in a number
+    // Count the number of digits in a number to check if the result is more than 15 digits
     private fun hasTooManyDigits(number: String): Boolean {
         if (number.isEmpty()) return false
 
@@ -72,7 +74,7 @@ abstract class CalculatorFragment : Fragment() {
             }
         }
 
-        return digitCount > 12
+        return digitCount > 15
     }
 
     // Render the expression and calculated result in the display fragment
@@ -88,7 +90,7 @@ abstract class CalculatorFragment : Fragment() {
 
         isFinalResult = false
         var cursorOffset = 1
-        var (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(displayFragment, expression)
+        var (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
 
         // Render equation and result
         expression = "$leftOfCursor$number$rightOfCursor"
@@ -111,7 +113,7 @@ abstract class CalculatorFragment : Fragment() {
             return
         }
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(
             displayFragment, expression)
 
         // Prevent user from entering an operator as the first char in the equation
@@ -149,7 +151,7 @@ abstract class CalculatorFragment : Fragment() {
         isFinalResult = false
         var cursorOffset = 0
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(displayFragment, expression)
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
 
         // Prevent user from entering numbers with more than one decimal
         val testEquation = "$leftOfCursor$decimal$rightOfCursor"
@@ -178,7 +180,7 @@ abstract class CalculatorFragment : Fragment() {
             return
         }
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(displayFragment, expression)
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
 
         if (mode == "simple") {
             val (equationWithSign, cursorOffset) = calcUtils.getSimpleEquationWithSign(expression,

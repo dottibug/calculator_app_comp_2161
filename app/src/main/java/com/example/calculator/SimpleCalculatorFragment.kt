@@ -62,7 +62,7 @@ class SimpleCalculatorFragment : CalculatorFragment() {
 
     // Handle backspace click
     fun onBackspace() {
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(displayFragment, expression)
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
 
         // Guard clause if cursor is at beginning of equation (nothing to delete)
         if (cursorPosition == 0) { return }

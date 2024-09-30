@@ -11,7 +11,7 @@ class FragmentUtilities {
     // SUBSTRING FUNCTIONS
     // ----------------------------------------------------------------------------------------------
     // Get cursor position and the substrings to the left and right of the cursor
-    fun getExpressionParts(displayFragment: DisplayFragment, expression: String) : Triple<Int,
+    fun getExpParts(displayFragment: DisplayFragment, expression: String) : Triple<Int,
             String, String> {
         val cursorPosition = displayFragment.getCursorPosition()
         val leftOfCursor = getLeftOfCursor(cursorPosition, expression)

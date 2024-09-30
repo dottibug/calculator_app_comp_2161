@@ -53,6 +53,13 @@ class ScientificCalculatorFragment : CalculatorFragment() {
         binding.buttonBracketOpen.setOnClickListener { onOpenBracketClick() }
         binding.buttonBracketClose.setOnClickListener { onCloseBracketClick() }
 
+        // Scientific calculator buttons
+        binding.buttonPi.setOnClickListener { onSpecialNumberClick("pi") }
+        binding.buttonEuler.setOnClickListener { onSpecialNumberClick("euler") }
+        binding.buttonSin.setOnClickListener { onTrigClick("sin") }
+        binding.buttonCos.setOnClickListener { onTrigClick("cos") }
+        binding.buttonTan.setOnClickListener { onTrigClick("tan") }
+
         return binding.root
     }
 
@@ -71,7 +78,7 @@ class ScientificCalculatorFragment : CalculatorFragment() {
             return
         }
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(displayFragment, expression)
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
 
         // Prevent user from entering an opening bracket if there is an operator to the immediate right
         if (rightOfCursor.isNotEmpty() && rightOfCursor.first() in setOf('+', '~', '×', '÷')) {
@@ -111,7 +118,7 @@ class ScientificCalculatorFragment : CalculatorFragment() {
             return
         }
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(displayFragment, expression)
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
 
         // Prevent user from entering closing bracket as the first character in an equation
         if (leftOfCursor.isEmpty()) { return }
@@ -144,7 +151,7 @@ class ScientificCalculatorFragment : CalculatorFragment() {
 
     // Handle backspace click
     fun onBackspace() {
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpressionParts(displayFragment, expression)
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
         var updatedLeftOfCursor = leftOfCursor
         var updatedRightOfCursor = rightOfCursor
 
@@ -162,5 +169,44 @@ class ScientificCalculatorFragment : CalculatorFragment() {
 
         expression = "$updatedLeftOfCursor$updatedRightOfCursor"
         renderExpressionAndResult(expression, cursorPosition -1, 0, mode)
+    }
+
+    // -------------------------------------------------------
+    // SCIENTIFIC BUTTONS
+    // -------------------------------------------------------
+
+    // Handle special number button clicks
+    fun onSpecialNumberClick(number: String) {
+        var specialSymbol = ""
+
+        when (number) {
+            "pi" -> specialSymbol = "π"
+            "euler" -> specialSymbol = "e"
+        }
+
+        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
+        expression = "$leftOfCursor$specialSymbol$rightOfCursor"
+        renderExpressionAndResult(expression, cursorPosition + specialSymbol.length, 0, mode)
+    }
+
+    // Handle trig function click
+    private fun onTrigClick(trigFunction: String) {
+        var trigSymbol = ""
+
+        when (trigFunction) {
+            "sin" -> trigSymbol = "sin("
+            "cos" -> trigSymbol = "cos("
+            "tan" -> trigSymbol = "tan("
+        }
+
+        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, 
+            expression)
+
+        if (leftOfCursor.isNotEmpty() && leftOfCursor.last().isDigit()) {
+            expression = "$leftOfCursor×$trigSymbol$rightOfCursor"
+        } else {
+            expression = "$leftOfCursor$trigSymbol$rightOfCursor"
+        }
+        displayFragment.renderExpression(expression, expression.length, 0)
     }
 }
