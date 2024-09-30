@@ -1,6 +1,6 @@
 package com.example.calculator
 
-import java.util.Locale
+import kotlin.reflect.KFunction2
 
 // Common utilities shared between the simple and scientific calculator fragments
 class CalculatorUtilities {
@@ -11,16 +11,16 @@ class CalculatorUtilities {
     // ----------------------------------------------------------------------------------------------
 
     // Number click listeners
-    fun setupNumberClickListeners(numberButtons: List<ButtonData>, onClick: (String) -> Unit) {
+    fun setupNumberClickListeners(numberButtons: List<ButtonData>, onClick: KFunction2<String, String, Unit>) {
         numberButtons.forEach { buttonData ->
-            buttonData.button.setOnClickListener { onClick(buttonData.value) }
+            buttonData.button.setOnClickListener { onClick(buttonData.value, buttonData.mode) }
         }
     }
 
     // Operator click listeners
-    fun setupOperatorClickListeners(operatorButtons: List<ButtonData>, onClick: (String) -> Unit) {
+    fun setupOperatorClickListeners(operatorButtons: List<ButtonData>, onClick: KFunction2<String, String, Unit>) {
         operatorButtons.forEach { buttonData ->
-            buttonData.button.setOnClickListener { onClick(buttonData.value) }
+            buttonData.button.setOnClickListener { onClick(buttonData.value, buttonData.mode) }
         }
     }
 
@@ -83,7 +83,7 @@ class CalculatorUtilities {
     // SIMPLE CALCULATOR FUNCTIONS
     // ----------------------------------------------------------------------------------------------
     // Calculates the result of an equation sequentially, from left to right, ignoring BEDMAS order of operations
-    fun calculateLeftToRight(equation: String, decimalPlaces: String = "10") : String {
+    fun calculateLeftToRight(equation: String) : String {
         // Guard clause for an empty equation
         if (equation.isEmpty()) return ""
 
@@ -114,8 +114,9 @@ class CalculatorUtilities {
 
         // Return result if the last character is an operator
         if (equation.last() in setOf('+', '~', '×', '÷')) {
-            val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0').trimEnd('.')
-            return formattedResult
+            return result.toString()
+//            val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0').trimEnd('.')
+//            return formattedResult
         }
 
         // If the last character is not an operator, calculate the final result
@@ -127,8 +128,9 @@ class CalculatorUtilities {
             '÷' -> if (num != 0.0) result /= num else return Double.NaN.toString()
         }
 
-        val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0').trimEnd('.')
-        return formattedResult
+//        val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0').trimEnd('.')
+//        return formattedResult
+        return result.toString()
     }
 
     // Toggle negative sign in simple equations (uses brackets)
@@ -210,7 +212,7 @@ class CalculatorUtilities {
     // Calculate the result of the equation using BEDMAS order of operations
     // Use the shunting-yard algorithm to calculate the result of the equation
     // NOTE Reference for algorithm: https://brilliant.org/wiki/shunting-yard-algorithm/
-    fun calculateBEDMAS(equation: String, decimalPlaces: String = "10") : String {
+    fun calculateBEDMAS(equation: String) : String {
 
         var equationToCalculate = equation
 
@@ -229,7 +231,7 @@ class CalculatorUtilities {
         if (postfixExpression.isEmpty()) { return "error" }
 
         else {
-            val result = try { evaluatePostfix(postfixExpression, decimalPlaces) }
+            val result = try { evaluatePostfix(postfixExpression) }
             catch (e: Exception) { return "error" }
             return result
         }
@@ -296,7 +298,7 @@ class CalculatorUtilities {
 
     // Calculate result of a postfix expression
     // NOTE: × is not the letter x, it is the multiplication symbol
-    private fun evaluatePostfix(postfix: MutableList<String>, decimalPlaces: String) : String {
+    private fun evaluatePostfix(postfix: MutableList<String>) : String {
         val stack = mutableListOf<String>()
 
         postfix.forEach { token ->
@@ -329,9 +331,10 @@ class CalculatorUtilities {
         // Return formatted result to the specified number of decimal places
         if (stack.size == 1) {
             val result = stack.last().toDouble()
-            val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0')
-                .trimEnd('.')
-            return formattedResult
+//            val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result).trimEnd('0')
+//                .trimEnd('.')
+//            return formattedResult
+            return result.toString()
         } else { return "error" }
     }
 

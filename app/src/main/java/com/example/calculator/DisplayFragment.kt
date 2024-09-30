@@ -7,6 +7,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -17,9 +18,9 @@ import com.example.calculator.databinding.FragmentDisplayBinding
 class DisplayFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayBinding
-     private lateinit var equationInput: EditText
+    private lateinit var expressionInput: EditText
     private lateinit var resultView: TextView
-    private val fragUtils = FragmentUtilities()
+    private lateinit var imm: InputMethodManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,34 +28,32 @@ class DisplayFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentDisplayBinding.inflate(inflater, container, false)
+        imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        equationInput = binding.editViewEquation
+        expressionInput = binding.editViewExpression
         resultView = binding.textViewResult
 
-        // Disable keyboard input
-        equationInput.showSoftInputOnFocus = false
-
-        // Set the cursor to the end of the equation
-        equationInput.requestFocus()
+        expressionInput.showSoftInputOnFocus = false
+        expressionInput.requestFocus()
     }
 
     // Get the cursor position in the equation EditText
     fun getCursorPosition() : Int {
-        return equationInput.selectionStart
+        return expressionInput.selectionStart
     }
 
     // Render equation in the EditText
-    fun renderEquation(equation: String, cursorPosition: Int, cursorOffset: Int) {
+    fun renderExpression(exp: String, cursorPosition: Int, cursorOffset: Int) {
         // Replace ~ in equation with - for the UI    −
-        val updatedEquation = equation.replace("~", "−")
-        val styledEquation = fragUtils.highlightOperators(updatedEquation, requireContext())
-        equationInput.setText(styledEquation)
-        equationInput.setSelection(cursorPosition + cursorOffset)
+        val updatedEquation = exp.replace("~", "−")
+        val styledEquation = highlightOperators(updatedEquation, requireContext())
+        expressionInput.setText(styledEquation)
+        expressionInput.setSelection(cursorPosition + cursorOffset)
     }
 
     // Render result in the TextView
@@ -66,6 +65,25 @@ class DisplayFragment : Fragment() {
     fun renderFinalResult(result: String) {
         val styledResult = colorFinalResult(result, requireContext())
         resultView.text = styledResult
+    }
+
+    // ----------------------------------------------------------------------------------------------
+    // STYLING
+    // ----------------------------------------------------------------------------------------------
+    // Color the operators in the equation
+    private fun highlightOperators(equation: String, context: Context): SpannableString {
+        val spannable = SpannableString(equation)
+        val operators = setOf('+', '−', '×', '÷')
+
+        for (i in equation.indices) {
+            if (equation[i] in operators) {
+                if (equation[i] in operators) {
+                    val colorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.aero))
+                    spannable.setSpan(colorSpan, i, i + 1, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
+        }
+        return spannable
     }
 
     // Color final result

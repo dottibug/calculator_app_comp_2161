@@ -27,8 +27,8 @@ class MemoryFragment : Fragment() {
         binding.buttonMemoryClear.setOnClickListener { onMemoryClear() }
         binding.buttonMemoryStore.setOnClickListener { onMemoryStore() }
         binding.buttonMemoryRecall.setOnClickListener { onMemoryRecall() }
-        binding.buttonMemoryAdd.setOnClickListener { onMemoryAdd() }
-        binding.buttonMemorySubtract.setOnClickListener { onMemorySubtract() }
+        binding.buttonMemoryAdd.setOnClickListener { onMemoryOperation("+") }
+        binding.buttonMemorySubtract.setOnClickListener { onMemoryOperation("~") }
 
         return binding.root
     }
@@ -48,10 +48,10 @@ class MemoryFragment : Fragment() {
     private fun onMemoryStore() {
         if (isScientificMode) {
             val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemStore()
+            scientificCalculatorFragment.onMemStore("scientific")
         } else {
             val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemStore()
+            simpleCalculatorFragment.onMemStore("simple")
         }
     }
 
@@ -59,32 +59,21 @@ class MemoryFragment : Fragment() {
     fun onMemoryRecall() {
         if (isScientificMode) {
             val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemRecall()
+            scientificCalculatorFragment.onMemRecall("scientific")
         } else {
             val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemRecall()
+            simpleCalculatorFragment.onMemRecall("simple")
         }
     }
 
-    // Add a number to the number in memory and replace memory with the new value
-    fun onMemoryAdd() {
+    // Add or subtract a number to the number in memory and replace memory with the new value
+    fun onMemoryOperation(operator: String) {
         if (isScientificMode) {
             val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemAdd()
+            scientificCalculatorFragment.onMemOperation("scientific", operator)
         } else {
             val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemAdd()
-        }
-    }
-
-    // Subtract a number to the number in memory and replace memory with the new value
-    fun onMemorySubtract() {
-        if (isScientificMode) {
-            val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemSubtract()
-        } else {
-            val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemSubtract()
+            simpleCalculatorFragment.onMemOperation("simple", operator)
         }
     }
 }
