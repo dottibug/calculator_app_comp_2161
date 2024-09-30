@@ -1,5 +1,6 @@
 package com.example.calculator
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import java.util.Locale
 
@@ -50,8 +51,28 @@ abstract class CalculatorFragment : Fragment() {
 
     // Count the number of digits in a number
     private fun hasTooManyDigits(number: String): Boolean {
-        val digits = number.replace(Regex("[^0-9.]"), "")
-        return digits.length > 12
+        if (number.isEmpty()) return false
+
+        val formattedNumber = String.format(Locale.CANADA,"%.${decimalPlaces}f", number.toDouble())
+            .trimEnd('0')
+            .trimEnd('.')
+
+        var digitCount = 0
+        if (formattedNumber.contains(".")) {
+            // Count digits of the unformatted number (we need to ignore the specified decimal
+            // places to accurately count the number of digits)
+            Log.i("testcat", "number is $number")
+            for (char in number) {
+                if (char.isDigit()) digitCount++
+            }
+        } else {
+            // Count digits of the formatted number
+            for (char in formattedNumber) {
+                if (char.isDigit()) digitCount++
+            }
+        }
+
+        return digitCount > 12
     }
 
     // Render the expression and calculated result in the display fragment
