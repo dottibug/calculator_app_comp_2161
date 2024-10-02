@@ -2,319 +2,246 @@ package com.example.calculator
 
 import android.content.Context
 import androidx.fragment.app.Fragment
-import java.util.Locale
 
-abstract class CalculatorFragment : Fragment() {
-    protected lateinit var displayFragment: DisplayFragment
-    protected lateinit var memoryFragment: MemoryFragment
-    protected val calcUtils = CalculatorUtilities()
-    protected val fragUtils = FragmentUtilities()
-    protected val memoryUtils = MemoryUtilities()
+// This is a parent class to the SimpleCalculator and ScientificCalculator classes. It uses the
+// MemoryCallback interface to handle communication
+abstract class Calculator : Fragment() {
+    protected lateinit var display: DisplayFragment
     protected var isFinalResult: Boolean = false
     protected var expression: String = ""
     protected var result: String = ""
     protected var memory: String = ""
     protected var decimalPlaces: Int = 10
+    protected val memoryManager = Memory()
+    protected val appUtils = AppUtils()
+    protected val calcUtils = CalcUtils()
+    protected val simpleCalc = SimpleCalculation()
+    protected val scientificCalc = ScientificCalculation()
 
-    // Calculate and render the result in the display fragment. Simple mode uses sequential
-    // calculation from left to right, ignoring BEDMAS order of operations. Scientific mode takes
-    // BEDMAS order of operations into account.
-    protected fun calculate(exp : String, mode : String, context: Context) {
-        if (mode == "simple") {
-            if (exp == "-") return
-            result = if (exp.isEmpty()) "" else calcUtils.calculateLeftToRight(exp)
-        }
-
-        if (mode == "scientific") {
-            if (exp == "(-" || exp == "abs((-" || exp == "(") return
-            result = if (exp.isEmpty()) "" else calcUtils.calculateBEDMAS(exp, context)
-        }
-
-        if (result == "error") {
-            fragUtils.showToast(requireContext(), "Invalid expression")
+    // Calculate result of an expression based on calculator mode. Simple mode calculates from
+    // left to right (ignoring BEDMAS order of operations), while scientific mode uses BEDMAS.
+    fun calculate(exp: String, mode: String, context: Context) {
+        if (exp.isEmpty()) {
+            result = ""
+            displayResult()
             return
         }
 
-        // Check if the result has more than 12 digits
-        val isTooLong = hasTooManyDigits(result)
-        if (isTooLong) {
-            fragUtils.showToast(requireContext(), "Max 12 digits in result")
-            return
+        result = when (mode) {
+            "simple" -> if (exp == "-") { "" }
+                        else { simpleCalc.calculateLeftToRight(exp) }
+
+            "scientific" -> if (exp in setOf("(-", "abs((-", "(")) { "" }
+                            else { scientificCalc.calculateBedmas(exp, context) }
+
+            else -> "error"
         }
-
-        // Format result to default (10) or user-specified number of decimal places
-        val formattedResult = String.format(Locale.CANADA,"%.${decimalPlaces}f", result.toDouble())
-            .trimEnd('0')
-            .trimEnd('.')
-        result = formattedResult
-
-        if (isFinalResult) { displayFragment.renderFinalResult(result) }
-        else { displayFragment.renderResult(result) }
+        handleCalculationResult(context)
     }
 
-    // Count the number of digits in a number to check if the result is more than 15 digits
-    private fun hasTooManyDigits(number: String): Boolean {
-        if (number.isEmpty()) return false
+    private fun handleCalculationResult(context: Context) {
+        when {
+            result == "error" -> appUtils.showToast(context, "Invalid expression")
 
-        val formattedNumber = String.format(Locale.CANADA,"%.${decimalPlaces}f", number.toDouble())
-            .trimEnd('0')
-            .trimEnd('.')
-
-        var digitCount = 0
-        if (formattedNumber.contains(".")) {
-            // Count digits of the unformatted number (we need to ignore the specified decimal
-            // places to accurately count the number of digits)
-            for (char in number) {
-                if (char.isDigit()) digitCount++
+            calcUtils.hasTooManyDigits(result, decimalPlaces) -> {
+                appUtils.showToast(context, "Max 12 digits in result")
             }
-        } else {
-            // Count digits of the formatted number
-            for (char in formattedNumber) {
-                if (char.isDigit()) digitCount++
+
+            else -> {
+                result = calcUtils.formatResult(result, decimalPlaces)
+                displayResult()
             }
         }
+    }
 
-        return digitCount > 15
+    private fun displayResult() {
+        if (isFinalResult) display.renderFinalResult(result)
+        else display.renderResult(result)
     }
 
     // Render the expression and calculated result in the display fragment
-    protected fun renderExpressionAndResult(exp: String, cursorPosition: Int, cursorOffset: Int,
-                                            mode: String) {
-        displayFragment.renderExpression(exp, cursorPosition, cursorOffset)
-        calculate(exp, mode, requireContext())
+    protected fun calcResultAndRefreshDisplay(exp: String, curPos: Int, curOffset: Int, mode: String) {
+        display.renderExpression(exp, curPos, curOffset)
+
+        if ((exp.isEmpty() && result.isEmpty()) || exp in setOf("-", "(-", "(")) {
+            displayResult()
+        } else {
+            calculate(exp, mode, requireContext())
+        }
     }
 
     // Handle number clicks
     protected fun onNumberClick(number: String, mode: String) {
         if (isFinalResult) expression = ""
 
+        var (cursorPos, left, right) = calcUtils.getParts(display, expression)
+        expression = "$left$number$right"
+
+        val cursorOffset = if (isFinalResult) 0 else 1
+        cursorPos = if (isFinalResult) 1 else cursorPos
+
         isFinalResult = false
-        var cursorOffset = 1
-        var (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-
-        // Render equation and result
-        expression = "$leftOfCursor$number$rightOfCursor"
-
-        // Handles cursor position and offset when a number is clicked while isFinalResult was true
-        if (expression.length == 1) {
-            cursorPosition = 1
-            cursorOffset = 0
-        }
-
-        renderExpressionAndResult(expression, cursorPosition, cursorOffset, mode)
+        calcResultAndRefreshDisplay(expression, cursorPos, cursorOffset, mode)
     }
 
     // Handle operator clicks
     protected fun onOperatorClick(operator: String, mode: String) {
+        var cursorOffset = 0
+        var (cursorPos, left, right) = calcUtils.getParts(display, expression)
+
+        if (!calcUtils.isOperatorAllowed(left, right, mode)) {
+            return
+        }
+
+        // Start new expression with result if user enters operator after a final result is shown
         if (isFinalResult && result != "error") {
             expression = "$result$operator"
-            isFinalResult = false
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            return
+            cursorPos = expression.length
         }
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(
-            displayFragment, expression)
-
-        // Prevent user from entering an operator as the first char in the equation
-        if (leftOfCursor.isEmpty()) { return }
-
-        // Prevent user from entering two operators in a row
-        if (calcUtils.hasDoubleOperators(leftOfCursor, rightOfCursor)) { return }
-
-        if (mode == "scientific") {
-            // Prevent user from entering an operator to the right of an open bracket
-            if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '(') { return }
+        // Add trailing 0 if user enters an operator beside a decimal
+        if (left.isNotEmpty() && left.last() == '.' && right.isEmpty()) {
+            expression = calcUtils.addTrailingZero(left, operator)
+            cursorOffset = 2
+        } else {
+            expression = "$left$operator$right"
+            cursorOffset = 1
         }
 
-        // Add trailing 0 if user enters operator beside a decimal
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '.' && rightOfCursor.isEmpty()) {
-            val zero = "0"
-            expression = "$leftOfCursor$zero$operator"
-            renderExpressionAndResult(expression, cursorPosition, 2, mode)
-            return
-        }
-
-        // Update equation and render equation
-        expression = "$leftOfCursor$operator$rightOfCursor"
-        renderExpressionAndResult(expression, cursorPosition, 1, mode)
+        calcResultAndRefreshDisplay(expression, cursorPos, cursorOffset, mode)
     }
 
     // Handle decimal clicks
     protected fun onDecimalClick(mode: String) {
         val decimal = "."
-        if (isFinalResult) {
-            if (result.contains('.')) return
-            else expression = "$result$decimal"
+
+        if (isFinalResult && result.contains('.')) {
+            expression = result
+        } else if (isFinalResult && !result.contains('.')) {
+            expression = "$result$decimal"
         }
 
         isFinalResult = false
-        var cursorOffset = 0
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
+        var cursorOffset = 0
+        val (cursorPos, left, right) = calcUtils.getParts(display, expression)
 
         // Prevent user from entering numbers with more than one decimal
-        val testEquation = "$leftOfCursor$decimal$rightOfCursor"
-
-        if (calcUtils.hasInvalidDecimal(testEquation)) {
-            expression = "$leftOfCursor$rightOfCursor"
-            renderExpressionAndResult(expression, cursorPosition, cursorOffset, mode)
-            return
+        if (calcUtils.hasInvalidDecimal("$left$decimal$right")) {
+            expression = "$left$right"
         } else {
-            // Add leading 0 if needed
-            val (decimalEquation, leadingZeroAdded) = calcUtils.getEquationWithDecimal(leftOfCursor, rightOfCursor)
-
-            // Render equation and result
+            val (decimalExpression, leadingZeroAdded) = calcUtils.getDecimalExpression(left, right)
+            expression = decimalExpression
             cursorOffset = if (leadingZeroAdded) 2 else 1
-            expression = decimalEquation
-            renderExpressionAndResult(expression, cursorPosition, cursorOffset, mode)
         }
+
+        calcResultAndRefreshDisplay(expression, cursorPos, cursorOffset, mode)
+    }
+
+    private fun startExpressionWithSignedResult(result: String, mode: String): String {
+        var signedResult = ""
+
+        when (mode) {
+            "simple" -> {
+                if (result.startsWith("-")) signedResult = result.removePrefix("-")
+                else signedResult = "-$result"
+            }
+
+            "scientific" -> {
+                if (result.startsWith("(-")) signedResult = result.removePrefix("(-")
+                else signedResult = "(-$result"
+            }
+
+            else -> {
+                signedResult = ""
+            }
+        }
+        return signedResult
     }
 
     protected fun onSignClick(mode: String) {
+        var (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        // If user clicks sign after final result is shown, start new expression with the result,
+        // changing its sign
         if (isFinalResult && result != "error") {
-            if (result.startsWith("-")) expression = result.removePrefix("-")
-            else expression = if (mode == "simple") "-$result" else "(-$result"
+            expression = startExpressionWithSignedResult(result, mode)
+            curPos = expression.length
             isFinalResult = false
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            return
         }
 
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
+        val (newExpression, newCursorOffset) = calcUtils.toggleNegativeSign(mode, expression, left,
+            right, curPos)
 
-        if (mode == "simple") {
-            val (equationWithSign, cursorOffset) = calcUtils.getSimpleEquationWithSign(expression,
-                leftOfCursor, rightOfCursor, cursorPosition)
-
-            // Render equation and result
-            expression = equationWithSign
-            renderExpressionAndResult(expression, cursorPosition, cursorOffset, mode)
-        }
-
-        if (mode == "scientific") {
-            val (equationWithSign, cursorOffset) = calcUtils.getScientificEquationWithSign(expression, leftOfCursor, rightOfCursor, cursorPosition)
-
-            // Render equation and result
-            expression = equationWithSign
-            renderExpressionAndResult(expression, cursorPosition, cursorOffset, mode)
-        }
+        expression = newExpression
+        calcResultAndRefreshDisplay(expression, curPos, newCursorOffset, mode)
     }
 
     protected fun onEqualClick(mode: String) {
         // Show toast message if equation is empty
         if (expression.isEmpty()) {
-            fragUtils.showToast(requireContext(), "Please enter an expression")
+            appUtils.showToast(requireContext(), "Please enter an expression")
             return
         }
 
         // If final character of the equation is an operator, show toast message
         if (expression.last() in setOf('+', '~', '×', '÷')) {
-            fragUtils.showToast(requireContext(), "Invalid expression")
+            appUtils.showToast(requireContext(), "Invalid expression")
             return
         }
 
         isFinalResult = true
-        calculate(expression, mode, requireContext())
+        calcResultAndRefreshDisplay(expression, expression.length, 0, mode)
     }
 
     // Clear equation, result, and display
-    protected fun onClearClick() {
+    protected fun onClearClick(mode: String) {
         expression = ""
         result = ""
         isFinalResult = false
-        displayFragment.renderExpression(expression, 0, 0)
-        displayFragment.renderResult(result)
+        calcResultAndRefreshDisplay(expression, 0, 0, mode)
     }
 
     // MEMORY FUNCTIONS //
     fun onMemStore(mode: String) {
-        var number = expression
-
-        if (expression.isEmpty() && result.isEmpty()) { return }
-
-        // If the result is final, store the result
-        if (isFinalResult) number = result
-
-        // Set isFinalResult to true so the result is rendered in the darker color
-        isFinalResult = true
-
-        val isValidNumber = memoryUtils.isNumber(number)
-        if (isValidNumber) {
-            memory = memoryUtils.getScientificNumber(number)
-            fragUtils.showToast(requireContext(), "Memory updated")
-            calculate(number, mode, requireContext())
+        val (response, memoryValue) = memoryManager.store(expression, result, isFinalResult)
+        appUtils.showToast(requireContext(), response)
+        if (response == "Memory updated") {
+            isFinalResult = true
+            calculate(memoryValue, mode, requireContext())
         }
-        else fragUtils.showToast(requireContext(), "Memory can only store numbers")
     }
 
     fun onMemRecall(mode: String) {
-        isFinalResult = false
-
-        if (memory.isEmpty()) {
-            fragUtils.showToast(requireContext(), "Memory is empty")
-            return
+        val (response, memoryValue) = memoryManager.recall()
+        appUtils.showToast(requireContext(), response)
+        if (response == "Memory recalled") {
+            expression += memoryValue
+            calcResultAndRefreshDisplay(expression, expression.length, 0, mode)
         }
-
-        if (expression.isNotEmpty()) {
-            if (expression.last() in setOf('+', '~', '×', '÷', '.')) {
-                expression = "${expression.dropLast(1)}+$memory"
-            } else {
-                expression = "$expression+$memory"
-            }
-
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            return
-        }
-
-        expression = memory
-        fragUtils.showToast(requireContext(), "Memory recalled")
-        renderExpressionAndResult(expression, expression.length, 0, mode)
     }
 
-
     fun onMemOperation(mode: String, operator: String) {
-        if (memory.isEmpty()) {
-            fragUtils.showToast(requireContext(), "Memory is empty")
-            return
-        }
+        val (response, newExpression) = memoryManager.operation(expression, result, operator,
+            isFinalResult)
 
-        // If equation and result are empty, but memory is not, start an equation with memory num
-        if (expression.isEmpty() && result.isEmpty() && memory.isNotEmpty()) {
+        if (response == "Memory updated" || response == "Memory recalled") {
+            isFinalResult = if (response == "Memory updated") { true } else { false }
+            calcResultAndRefreshDisplay(newExpression, newExpression.length, 0, mode)
+            memory = result
+        } else {
             isFinalResult = false
-            expression = memory
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            return
         }
 
-        // If a final result is displayed, add/subtract memory num to the result
-        if (isFinalResult) {
-            expression = "$result$operator$memory"
-            isFinalResult = true
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            memory = result
-            fragUtils.showToast(requireContext(), "Memory updated")
-            return
-        }
-
-        // If equation is not empty, add/subtract memory num to the end of the equation
-        isFinalResult = false
-        var number = expression
-        val isValidNumber = memoryUtils.isNumber(number)
-
-        if (isValidNumber) {
-            val simpleNumber = memoryUtils.getSimpleNumber(number)
-            expression = "$simpleNumber$operator$memory"
-            isFinalResult = true
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            memory = result
-            fragUtils.showToast(requireContext(), "Memory updated")
-        }
-        else fragUtils.showToast(requireContext(), "Memory can only store numbers")
+        memoryManager.setMemory(result)
+        expression = newExpression
+        appUtils.showToast(requireContext(), response)
     }
 
     fun onMemClear() {
+        val (response, memoryValue) = memoryManager.clear()
+        memory = memoryValue
         isFinalResult = false
-        memory = ""
-        fragUtils.showToast(requireContext(), "Memory cleared")
+        appUtils.showToast(requireContext(), response)
     }
 }

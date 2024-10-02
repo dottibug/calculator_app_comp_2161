@@ -9,14 +9,11 @@ import androidx.navigation.fragment.findNavController
 import com.example.calculator.databinding.FragmentToolsBinding
 
 class ToolsFragment : Fragment() {
-
     private lateinit var binding : FragmentToolsBinding
     private lateinit var activity : MainActivity
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): View {
         // Inflate the dataBinding layout for this fragment
         binding = FragmentToolsBinding.inflate(inflater, container, false)
 

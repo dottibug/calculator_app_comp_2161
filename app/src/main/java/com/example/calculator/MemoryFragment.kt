@@ -13,67 +13,71 @@ class MemoryFragment : Fragment() {
     private lateinit var activity: MainActivity
     private var isScientificMode : Boolean = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): View {
         // Inflate the dataBinding layout for this fragment
         binding = FragmentMemoryBinding.inflate(inflater, container, false)
-
         activity = requireActivity() as MainActivity
         isScientificMode = activity.isScientificMode
-
-        // Create click listeners
-        binding.buttonMemoryClear.setOnClickListener { onMemoryClear() }
-        binding.buttonMemoryStore.setOnClickListener { onMemoryStore() }
-        binding.buttonMemoryRecall.setOnClickListener { onMemoryRecall() }
-        binding.buttonMemoryAdd.setOnClickListener { onMemoryOperation("+") }
-        binding.buttonMemorySubtract.setOnClickListener { onMemoryOperation("~") }
-
+        setupButtons()
         return binding.root
     }
 
-    // Clear memory
-    fun onMemoryClear() {
-        if (isScientificMode) {
-            val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemClear()
+    private fun getActiveCalculatorFragment(): Fragment? {
+        return if (isScientificMode) {
+            parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as
+                ScientificCalculatorFragment?
         } else {
-            val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemClear()
+            parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as
+                SimpleCalculatorFragment?
+        }
+    }
+
+    // Clear memory
+    private fun onMemoryClear() {
+        val fragment = getActiveCalculatorFragment()
+
+        when (fragment) {
+            is SimpleCalculatorFragment -> fragment.onMemClear()
+            is ScientificCalculatorFragment -> fragment.onMemClear()
         }
     }
 
     // Store the number in equation to memory (if it's a valid number)
     private fun onMemoryStore() {
-        if (isScientificMode) {
-            val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemStore("scientific")
-        } else {
-            val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemStore("simple")
+        val fragment = getActiveCalculatorFragment()
+
+        when (fragment) {
+            is SimpleCalculatorFragment -> fragment.onMemStore("simple")
+            is ScientificCalculatorFragment -> fragment.onMemStore("scientific")
         }
     }
 
     // Display the number in memory
-    fun onMemoryRecall() {
-        if (isScientificMode) {
-            val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemRecall("scientific")
-        } else {
-            val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemRecall("simple")
+    private fun onMemoryRecall() {
+        val fragment = getActiveCalculatorFragment()
+
+        when (fragment) {
+            is SimpleCalculatorFragment -> fragment.onMemRecall("simple")
+            is ScientificCalculatorFragment -> fragment.onMemRecall("scientific")
         }
     }
 
     // Add or subtract a number to the number in memory and replace memory with the new value
-    fun onMemoryOperation(operator: String) {
-        if (isScientificMode) {
-            val scientificCalculatorFragment = parentFragmentManager.findFragmentById(R.id.scientificCalculatorFragment) as ScientificCalculatorFragment
-            scientificCalculatorFragment.onMemOperation("scientific", operator)
-        } else {
-            val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
-            simpleCalculatorFragment.onMemOperation("simple", operator)
+    private fun onMemoryOperation(operator: String) {
+        val fragment = getActiveCalculatorFragment()
+
+        when (fragment) {
+            is SimpleCalculatorFragment -> fragment.onMemOperation("simple", operator)
+            is ScientificCalculatorFragment -> fragment.onMemOperation("scientific", operator)
         }
+    }
+
+    private fun setupButtons() {
+        binding.buttonMemoryClear.setOnClickListener { onMemoryClear() }
+        binding.buttonMemoryStore.setOnClickListener { onMemoryStore() }
+        binding.buttonMemoryRecall.setOnClickListener { onMemoryRecall() }
+        binding.buttonMemoryAdd.setOnClickListener { onMemoryOperation("+") }
+        binding.buttonMemorySubtract.setOnClickListener { onMemoryOperation("~") }
     }
 }

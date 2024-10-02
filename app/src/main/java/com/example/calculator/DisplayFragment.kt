@@ -16,16 +16,13 @@ import com.example.calculator.databinding.FragmentDisplayBinding
 
 // Fragment to display the running equation and result of the calculation
 class DisplayFragment : Fragment() {
-
     private lateinit var binding: FragmentDisplayBinding
     private lateinit var expressionInput: EditText
     private lateinit var resultView: TextView
     private lateinit var imm: InputMethodManager
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentDisplayBinding.inflate(inflater, container, false)
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -40,7 +37,7 @@ class DisplayFragment : Fragment() {
 
         expressionInput.showSoftInputOnFocus = false
         // BUG The keyboard keeps opening when we request focus on the EditText multiline
-//        expressionInput.requestFocus()
+        expressionInput.requestFocus()
         imm.hideSoftInputFromWindow(expressionInput.windowToken, 0)
     }
 

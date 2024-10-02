@@ -6,56 +6,249 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.calculator.databinding.FragmentScientificCalculatorBinding
 
+// TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateBEDMAS
+//  functions)
+
 // NOTE: The scientific calculator uses BEDMAS order of operations to calculate the result
-class ScientificCalculatorFragment : CalculatorFragment() {
+class ScientificCalculatorFragment : Calculator() {
     private lateinit var binding: FragmentScientificCalculatorBinding
     private val mode = "scientific"
 
-    // TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateBEDMAS
-    //  functions)
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         binding = FragmentScientificCalculatorBinding.inflate(inflater, container, false)
+        setupButtons()
+        return binding.root
+    }
 
-        // List of buttons to set up click listeners for
-        // TODO This can be refactored into a loop
-        val numberButtons = listOf(
-            ButtonData(binding.button0, "0", mode),
-            ButtonData(binding.button1, "1", mode),
-            ButtonData(binding.button2, "2", mode),
-            ButtonData(binding.button3, "3", mode),
-            ButtonData(binding.button4, "4", mode),
-            ButtonData(binding.button5, "5", mode),
-            ButtonData(binding.button6, "6", mode),
-            ButtonData(binding.button7, "7", mode),
-            ButtonData(binding.button8, "8", mode),
-            ButtonData(binding.button9, "9", mode)
-        )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        display = parentFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
+    }
 
-        // Note: × is the multiplication symbol, not the letter x
-        val operatorButtons = listOf(
-            ButtonData(binding.buttonAdd, "+", mode),
-            ButtonData(binding.buttonSubtract, "~", mode),
-            ButtonData(binding.buttonMultiply, "×", mode),
-            ButtonData(binding.buttonDivide, "÷", mode)
-        )
+    private fun appendToFinalResult(bracket: String): Boolean {
+        if (isFinalResult && result != "error") {
+            expression = "${result}${bracket}"
+            isFinalResult = false
+            calcResultAndRefreshDisplay(expression, expression.length, 0, mode)
+            return true
+        }
+        return false
+    }
 
-        calcUtils.setupNumberClickListeners(numberButtons, ::onNumberClick)
-        calcUtils.setupOperatorClickListeners(operatorButtons, ::onOperatorClick)
-        binding.buttonClear.setOnClickListener { onClearClick() }
+    private fun appendToExpression(bracket: String, left: String, right: String, curPos: Int,
+        offset: Int) {
+        expression = "$left$bracket$right"
+        calcResultAndRefreshDisplay(expression, curPos, offset, mode)
+    }
+
+    // Handle open bracket clicks
+    private fun onOpenBracketClick() {
+        if (appendToFinalResult("×(")) { return }
+
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        // Prevent user from entering an opening bracket if there is an operator to the immediate right
+        if (right.isNotEmpty() && right.first() in setOf('+', '~', '×', '÷')) { return }
+
+        // Add a multiplication symbol if user enters an opening bracket to the immediate right
+        // of a digit or to the immediate right of a closed bracket
+        if (left.isNotEmpty() && (left.last().isDigit() || left.last() == ')')) {
+            appendToExpression("×(", left, right, curPos, 2)
+            return
+        }
+        appendToExpression("(", left, right, curPos, 1)
+    }
+
+    // Prevents user from entering a closed bracket:
+    // 1. As the first char in an expression
+    // 2. Immediately after an open bracket - ie. ()
+    // 3. Immediately after an operator - ie. +)
+    // 4. Immediately after a negative sign - ie. -)
+    // 5. If the expression does not contain a matching open bracket
+    private fun isInvalidClosedBracket(left: String): Boolean {
+        val symbolSet = setOf('+', '~', '×', '÷', '(', '-')
+
+        if (left.isEmpty() || (left.isNotEmpty() && left.last() in symbolSet)) { return true }
+
+        // Check for matching open brackets. Add 1 to closed count as the just-clicked closed
+        // bracket is not yet part of the expression
+        val openCount = left.count { it == '(' }
+        val closedCount = left.count { it == ')' } + 1
+
+        return openCount < closedCount
+    }
+
+    // Handle close bracket clicks
+    private fun onClosedBracketClick() {
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        if (isInvalidClosedBracket(left)) { return }
+
+        // Add trailing 0 if user enters closing bracket beside a decimal
+        if (left.isNotEmpty() && left.last() == '.' && right.isEmpty()) {
+            appendToExpression("0)", left, right, curPos, 2)
+            return
+        }
+
+        appendToExpression(")", left, right, curPos, 1)
+    }
+
+    // Handle backspace click
+    fun onBackspace() {
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+        var updatedLeft = left
+        var updatedRight = right
+
+        // Guard clause if cursor is at beginning of equation (nothing to delete)
+        if (expression.isEmpty() || curPos == 0) { return }
+
+        // Delete the character at the cursor position
+        updatedLeft = updatedLeft.dropLast(1)
+
+        // If the right of cursor is a decimal, add a leading zero
+        if (updatedRight.isNotEmpty() && updatedRight.first() == '.' && updatedLeft.last()
+            in setOf('+', '~', '×', '÷')) {
+            updatedRight = "0$updatedRight"
+        }
+
+        expression = "$updatedLeft$updatedRight"
+        calcResultAndRefreshDisplay(expression, curPos - 1, 0, mode)
+    }
+
+    // -------------------------------------------------------
+    // SCIENTIFIC BUTTONS
+    // -------------------------------------------------------
+
+    private val addMultSymbolToLeftPart = setOf(")", "π", "e", "!", "^(2)", "^(3)")
+    private val addMultSymbolToRightPart = setOf("(", "√(", "π", "e", "abs(", "sin(", "cos(", "tan(")
+
+    private fun appendSymbol(symbol: String) {
+        var newSymbol = symbol
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any
+            { left.endsWith(it) })) {
+            newSymbol = "×$newSymbol"
+        }
+
+        expression = "$left$symbol$right"
+        val newCurPos = curPos + newSymbol.length
+        display.renderExpression(expression, newCurPos, 0)
+    }
+
+
+    // Returns true if the input ends with any of the math symbols
+    private fun appendMultiplySymbol(symbol: String, left: String, right: String): String {
+
+        var newSymbol = symbol
+
+        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any
+            { left.endsWith(it) })) {
+            newSymbol = "×$newSymbol"
+        }
+
+        if (right.isNotEmpty() && (right.first().isDigit() || addMultSymbolToRightPart.any
+            { right.startsWith(it) })) {
+            newSymbol = "$newSymbol×"
+        }
+        return newSymbol
+    }
+
+    private fun appendSymbolAndCalculate(symbol: String) {
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        val newSymbol = appendMultiplySymbol(symbol, left, right)
+
+        expression = "$left$newSymbol$right"
+        val newCurPos = curPos + newSymbol.length
+        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
+    }
+
+    // Handle special number button clicks
+    private fun onConstantClick(number: String) {
+        val constantSymbol = if (number == "pi") "π" else "e"
+        appendSymbolAndCalculate(constantSymbol)
+    }
+
+    // Handle trig function click
+    private fun onTrigClick(trigFunction: String) {
+        var trigSymbol = ""
+        when (trigFunction) {
+            "sin" -> trigSymbol = "sin("
+            "cos" -> trigSymbol = "cos("
+            "tan" -> trigSymbol = "tan("
+        }
+        appendSymbol(trigSymbol)
+    }
+
+    // Handle square root click
+    private fun onSquareRootClick() {
+        val squareRoot = "√("
+        appendSymbol(squareRoot)
+    }
+
+    // Handle exponent click
+    private fun onExponentClick(exponent: String) {
+        val exponentSymbol = if (exponent == "square") { "^(2)" } else { "^(3)" }
+        appendSymbolAndCalculate(exponentSymbol)
+    }
+
+    // Handle absolute value click
+    private fun onAbsClick() {
+        val abs = "abs("
+        appendSymbol(abs)
+    }
+
+    // Handle factorial click
+    private fun onFactorialClick() {
+        val factorial = "!"
+        appendSymbolAndCalculate(factorial)
+    }
+
+    // -------------------------------------------------------
+    // BUTTON SETUP
+    // -------------------------------------------------------
+    private fun setupButtons() {
+        setupNumberButtons()
+        setupOperatorButtons()
+        setupSpecialButtons()
+        setupScientificButtons()
+    }
+
+    private fun setupNumberButtons() {
+        binding.button0.setOnClickListener { onNumberClick("0", mode) }
+        binding.button1.setOnClickListener { onNumberClick("1", mode) }
+        binding.button2.setOnClickListener { onNumberClick("2", mode) }
+        binding.button3.setOnClickListener { onNumberClick("3", mode) }
+        binding.button4.setOnClickListener { onNumberClick("4", mode) }
+        binding.button5.setOnClickListener { onNumberClick("5", mode) }
+        binding.button6.setOnClickListener { onNumberClick("6", mode) }
+        binding.button7.setOnClickListener { onNumberClick("7", mode) }
+        binding.button8.setOnClickListener { onNumberClick("8", mode) }
+        binding.button9.setOnClickListener { onNumberClick("9", mode) }
+    }
+
+    private fun setupOperatorButtons() {
+        binding.buttonAdd.setOnClickListener { onOperatorClick("+", mode) }
+        binding.buttonSubtract.setOnClickListener { onOperatorClick("~", mode) }
+        binding.buttonMultiply.setOnClickListener { onOperatorClick("×", mode) }
+        binding.buttonDivide.setOnClickListener { onOperatorClick("÷", mode) }
+    }
+
+    private fun setupSpecialButtons() {
+        binding.buttonClear.setOnClickListener { onClearClick(mode) }
         binding.buttonEqual.setOnClickListener { onEqualClick(mode) }
         binding.buttonDecimal.setOnClickListener { onDecimalClick(mode) }
         binding.buttonSign.setOnClickListener { onSignClick(mode) }
         binding.buttonBracketOpen.setOnClickListener { onOpenBracketClick() }
-        binding.buttonBracketClose.setOnClickListener { onCloseBracketClick() }
+        binding.buttonBracketClose.setOnClickListener { onClosedBracketClick() }
+    }
 
-        // Scientific calculator buttons
-        binding.buttonPi.setOnClickListener { onSpecialNumberClick("pi") }
-        binding.buttonEuler.setOnClickListener { onSpecialNumberClick("euler") }
+    private fun setupScientificButtons() {
+        binding.buttonPi.setOnClickListener { onConstantClick("pi") }
+        binding.buttonEuler.setOnClickListener { onConstantClick("euler") }
         binding.buttonSin.setOnClickListener { onTrigClick("sin") }
         binding.buttonCos.setOnClickListener { onTrigClick("cos") }
         binding.buttonTan.setOnClickListener { onTrigClick("tan") }
@@ -64,222 +257,5 @@ class ScientificCalculatorFragment : CalculatorFragment() {
         binding.buttonCube.setOnClickListener { onExponentClick("cube") }
         binding.buttonAbs.setOnClickListener { onAbsClick() }
         binding.buttonFactorial.setOnClickListener { onFactorialClick() }
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        // Get the display fragment
-        displayFragment = parentFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
-    }
-
-    // Handle open bracket clicks
-    private fun onOpenBracketClick() {
-        if (isFinalResult && result != "error") {
-            expression = "$result×("
-            isFinalResult = false
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            return
-        }
-
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-
-        // Prevent user from entering an opening bracket if there is an operator to the immediate right
-        if (rightOfCursor.isNotEmpty() && rightOfCursor.first() in setOf('+', '~', '×', '÷')) {
-            return }
-
-        // Add a multiplication symbol if user enters an opening bracket to the immediate right
-        // of a digit
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('0', '1', '2', '3', '4',
-                '5', '6', '7', '8', '9')) {
-            val multiplication = "×("
-            expression = "$leftOfCursor$multiplication$rightOfCursor"
-            renderExpressionAndResult(expression, cursorPosition, 2, mode)
-            return
-        }
-
-        // Add a multiplication symbol if user enters an opening bracket right beside an closing
-        // bracket
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == ')') {
-            val multiplication = "×("
-            expression = "$leftOfCursor$multiplication$rightOfCursor"
-            renderExpressionAndResult(expression, cursorPosition, 2, mode)
-            return
-        }
-
-        // Render equation and result
-        val bracket = "("
-        expression = "$leftOfCursor$bracket$rightOfCursor"
-        renderExpressionAndResult(expression, cursorPosition, 1, mode)
-    }
-
-    // Handle close bracket clicks
-    private fun onCloseBracketClick() {
-        if (isFinalResult && result != "error") {
-            expression = result
-            isFinalResult = false
-            renderExpressionAndResult(expression, expression.length, 0, mode)
-            return
-        }
-
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-
-        // Prevent user from entering closing bracket as the first character in an equation
-        if (leftOfCursor.isEmpty()) { return }
-
-        // Prevent user from entering a closing bracket right beside an opening bracket
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '(') { return }
-
-        // Prevent user from entering a closing bracket if there is no opening bracket
-        if (!leftOfCursor.contains('(')) { return }
-
-        // Prevent user from entering a closing bracket to the right of an operator
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷')) { return }
-
-        // Prevent user from entering (-)
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '-') { return}
-
-        // Add trailing 0 if user enters closing bracket beside a decimal
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() == '.' && rightOfCursor.isEmpty()) {
-            val zero = "0"
-            expression = "$leftOfCursor$zero)"
-            renderExpressionAndResult(expression, cursorPosition, 2, mode)
-            return
-        }
-
-        // Render equation and result
-        val bracket = ")"
-        expression = "$leftOfCursor$bracket$rightOfCursor"
-        renderExpressionAndResult(expression, cursorPosition, 1, mode)
-    }
-
-    // Handle backspace click
-    fun onBackspace() {
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-        var updatedLeftOfCursor = leftOfCursor
-        var updatedRightOfCursor = rightOfCursor
-
-        // Guard clause if cursor is at beginning of equation (nothing to delete)
-        if (cursorPosition == 0) { return }
-
-        // Delete the character at the cursor position
-        updatedLeftOfCursor = updatedLeftOfCursor.dropLast(1)
-
-        // If the right of cursor is a decimal, add a leading zero
-        if (updatedRightOfCursor.isNotEmpty() && updatedRightOfCursor.first() == '.' &&
-            updatedLeftOfCursor.last() in setOf('+', '~', '×', '÷')) {
-            updatedRightOfCursor = "0$updatedRightOfCursor"
-        }
-
-        expression = "$updatedLeftOfCursor$updatedRightOfCursor"
-        renderExpressionAndResult(expression, cursorPosition -1, 0, mode)
-    }
-
-    // -------------------------------------------------------
-    // SCIENTIFIC BUTTONS
-    // -------------------------------------------------------
-
-    // Handle special number button clicks
-    fun onSpecialNumberClick(number: String) {
-        var specialSymbol = ""
-
-        when (number) {
-            "pi" -> specialSymbol = "π"
-            "euler" -> specialSymbol = "e"
-        }
-
-        val (cursorPosition, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-        expression = "$leftOfCursor$specialSymbol$rightOfCursor"
-        renderExpressionAndResult(expression, cursorPosition + specialSymbol.length, 0, mode)
-    }
-
-    // Handle trig function click
-    private fun onTrigClick(trigFunction: String) {
-        var trigSymbol = ""
-
-        when (trigFunction) {
-            "sin" -> trigSymbol = "sin("
-            "cos" -> trigSymbol = "cos("
-            "tan" -> trigSymbol = "tan("
-        }
-
-        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, 
-            expression)
-
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last().isDigit()) {
-            expression = "$leftOfCursor×$trigSymbol$rightOfCursor"
-        } else {
-            expression = "$leftOfCursor$trigSymbol$rightOfCursor"
-        }
-        displayFragment.renderExpression(expression, expression.length, 0)
-    }
-
-    // Handle square root click
-    private fun onSquareRootClick() {
-        var squareRoot = "√("
-        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last().isDigit()) {
-            expression = "$leftOfCursor×$squareRoot$rightOfCursor"
-        } else {
-            expression = "$leftOfCursor$squareRoot$rightOfCursor"
-        }
-        displayFragment.renderExpression(expression, expression.length, 0)
-    }
-
-    // Handle exponent click
-    private fun onExponentClick(exponent: String) {
-        if (expression.isEmpty()) { return }
-
-        var exponentSymbol = ""
-
-        when (exponent) {
-            "square" -> exponentSymbol = "^(2)"
-            "cube" -> exponentSymbol = "^(3)"
-        }
-
-        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷')) {
-            return
-        } else {
-            expression = "$leftOfCursor$exponentSymbol$rightOfCursor"
-        }
-
-        renderExpressionAndResult(expression, expression.length, 0, mode)
-    }
-
-
-    // Handle absolute value click
-    private fun onAbsClick() {
-        var abs = "abs("
-
-        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last().isDigit()) {
-            expression = "$leftOfCursor×$abs$rightOfCursor"
-        } else {
-            expression = "$leftOfCursor$abs$rightOfCursor"
-        }
-
-        displayFragment.renderExpression(expression, expression.length, 0)
-    }
-
-    // Handle factorial click
-    private fun onFactorialClick() {
-        if (expression.isEmpty()) { return }
-
-        var factorial = "!"
-
-        val (_, leftOfCursor, rightOfCursor) = fragUtils.getExpParts(displayFragment, expression)
-
-        if (leftOfCursor.isNotEmpty() && leftOfCursor.last() in setOf('+', '~', '×', '÷')) {
-            return
-        } else {
-            expression = "$leftOfCursor$factorial$rightOfCursor"
-        }
-
-        renderExpressionAndResult(expression, expression.length, 0, mode)
     }
 }
