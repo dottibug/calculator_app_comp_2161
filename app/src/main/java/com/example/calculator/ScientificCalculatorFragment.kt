@@ -1,6 +1,7 @@
 package com.example.calculator
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -98,22 +99,20 @@ class ScientificCalculatorFragment : Calculator() {
     // Handle backspace click
     fun onBackspace() {
         val (curPos, left, right) = calcUtils.getParts(display, expression)
-        var updatedLeft = left
-        var updatedRight = right
 
         // Guard clause if cursor is at beginning of equation (nothing to delete)
         if (expression.isEmpty() || curPos == 0) { return }
 
         // Delete the character at the cursor position
-        updatedLeft = updatedLeft.dropLast(1)
+        val updatedLeft = left.dropLast(1)
 
         // If the right of cursor is a decimal, add a leading zero
-        if (updatedRight.isNotEmpty() && updatedRight.first() == '.' && updatedLeft.last()
-            in setOf('+', '~', '×', '÷')) {
-            updatedRight = "0$updatedRight"
-        }
+//        if (updatedRight.isNotEmpty() && updatedRight.first() == '.' && updatedLeft.last()
+//            in setOf('+', '~', '×', '÷')) {
+//            updatedRight = "0$updatedRight"
+//        }
 
-        expression = "$updatedLeft$updatedRight"
+        expression = "$updatedLeft$right"
         calcResultAndRefreshDisplay(expression, curPos - 1, 0, mode)
     }
 
@@ -124,16 +123,17 @@ class ScientificCalculatorFragment : Calculator() {
     private val addMultSymbolToLeftPart = setOf(")", "π", "e", "!", "^(2)", "^(3)")
     private val addMultSymbolToRightPart = setOf("(", "√(", "π", "e", "abs(", "sin(", "cos(", "tan(")
 
-    private fun appendSymbol(symbol: String) {
+    private fun appendSymbol2(symbol: String) {
         var newSymbol = symbol
         val (curPos, left, right) = calcUtils.getParts(display, expression)
 
-        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any
-            { left.endsWith(it) })) {
-            newSymbol = "×$newSymbol"
+        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any { left.endsWith(it) })) {
+            if (newSymbol in setOf("π", "e", "sin(", "cos(", "tan(", "abs(", "√(")) {
+                newSymbol = "×$newSymbol"
+            }
         }
 
-        expression = "$left$symbol$right"
+        expression = "$left$newSymbol$right"
         val newCurPos = curPos + newSymbol.length
         display.renderExpression(expression, newCurPos, 0)
     }
@@ -143,10 +143,12 @@ class ScientificCalculatorFragment : Calculator() {
     private fun appendMultiplySymbol(symbol: String, left: String, right: String): String {
 
         var newSymbol = symbol
+        val exponents = setOf("^(2)", "^(3)")
 
-        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any
-            { left.endsWith(it) })) {
-            newSymbol = "×$newSymbol"
+        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any { left.endsWith(it) })) {
+            if (newSymbol in setOf("π", "e", "sin(", "cos(", "tan(", "abs(", "√(")) {
+                newSymbol = "×$newSymbol"
+            }
         }
 
         if (right.isNotEmpty() && (right.first().isDigit() || addMultSymbolToRightPart.any
@@ -156,15 +158,13 @@ class ScientificCalculatorFragment : Calculator() {
         return newSymbol
     }
 
-    private fun appendSymbolAndCalculate(symbol: String) {
-        val (curPos, left, right) = calcUtils.getParts(display, expression)
-
-        val newSymbol = appendMultiplySymbol(symbol, left, right)
-
-        expression = "$left$newSymbol$right"
-        val newCurPos = curPos + newSymbol.length
-        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
-    }
+//    private fun appendSymbolAndCalculate(symbol: String) {
+//        val (curPos, left, right) = calcUtils.getParts(display, expression)
+////        val newSymbol = appendMultiplySymbol(symbol, left, right)
+//        expression = "$left$symbol$right"
+//        val newCurPos = curPos + symbol.length
+//        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
+//    }
 
     // Handle special number button clicks
     private fun onConstantClick(number: String) {
@@ -180,13 +180,13 @@ class ScientificCalculatorFragment : Calculator() {
             "cos" -> trigSymbol = "cos("
             "tan" -> trigSymbol = "tan("
         }
-        appendSymbol(trigSymbol)
+//        appendSymbol(trigSymbol)
     }
 
     // Handle square root click
     private fun onSquareRootClick() {
         val squareRoot = "√("
-        appendSymbol(squareRoot)
+//        appendSymbol(squareRoot)
     }
 
     // Handle exponent click
@@ -195,16 +195,148 @@ class ScientificCalculatorFragment : Calculator() {
         appendSymbolAndCalculate(exponentSymbol)
     }
 
-    // Handle absolute value click
     private fun onAbsClick() {
-        val abs = "abs("
-        appendSymbol(abs)
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        if (right.isEmpty() || !right.contains('|')) {
+            expression = "$left|$right"
+            val newCurPos = curPos + 1
+            display.renderExpression(expression, newCurPos, 0)
+        } else {
+            appendSymbolAndCalculate("|")
+        }
+    }
+
+    // Handle absolute value click
+    private fun onAbsClick2() {
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        // Allows user to close the absolute value function
+        if (left.count { it == '|' } % 2 != 0) {
+            appendSymbolAndCalculate("|")
+            return
+        }
+
+        // Check for invalid position to put absolute value symbol
+        if (left.isNotEmpty()) {
+            val last = left.last()
+            val invalidChars = setOf(')', '!', 'e', 'π')
+            val invalidEndings = listOf("sin(", "cos(", "tan(", "^(2)", "^(3)", "√(")
+
+            // Add multiplication symbol next to invalid character or endings
+            if (last.isDigit() || last in invalidChars || invalidEndings.any { left.endsWith(it) }) {
+                appendSymbolAndCalculate("×|")
+                return
+            }
+        }
+
+        appendSymbolAndCalculate("|")
     }
 
     // Handle factorial click
     private fun onFactorialClick() {
-        val factorial = "!"
-        appendSymbolAndCalculate(factorial)
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+
+        // Check if the last character is already a factorial
+        if (left.isNotEmpty() && left.last() == '!') {
+            appUtils.showToast(requireContext(), "Invalid operation")
+            return
+        }
+
+        // Extract the leftmost number from the left part
+        val lastNumber = calcUtils.extractLeftmostNumber(left.reversed()).reversed()
+
+        if (lastNumber.isEmpty() || lastNumber.contains(".")) {
+            appUtils.showToast(requireContext(), "Factorial must be a positive integer")
+            return
+        }
+
+        // Check if the right part starts with an operator or is empty
+        if (right.isNotEmpty() && right.first() !in setOf('+', '~', '×', '÷')) {
+            appUtils.showToast(requireContext(), "Invalid position for factorial")
+            return
+        }
+
+        val number = lastNumber.toIntOrNull()
+        if (number == null || number > 12) {  // 13! exceeds the calculator's max of 12 digits
+            appUtils.showToast(requireContext(), "Number too large for factorial")
+            return
+        }
+
+        appendSymbolAndCalculate("!")
+    }
+
+    private fun appendSymbolAndCalculate(symbol: String) {
+        val (curPos, left, right) = calcUtils.getParts(display, expression)
+        var newExpression = expression
+        var newCurPos = curPos
+
+        // Handle different types of symbols
+        when {
+            // For postfix operators like factorial
+            symbol == "!" -> {
+                newExpression = "$left$symbol$right"
+                newCurPos += 1
+            }
+            // For prefix functions like sin, cos, tan, abs, sqrt
+            symbol in listOf("sin(", "cos(", "tan(", "abs(", "√(") -> {
+                // Add multiplication symbol if needed
+                if (left.isNotEmpty() && (left.last().isDigit() || left.last() in "πe)")) {
+                    newExpression = "$left×$symbol$right"
+                    newCurPos += symbol.length + 1
+                } else {
+                    newExpression = "$left$symbol$right"
+                    newCurPos += symbol.length
+                }
+            }
+            // For constants like π and e
+            symbol in listOf("π", "e") -> {
+                // Add multiplication symbol if needed
+                if (left.isNotEmpty() && (left.last().isDigit() || left.last() in "πe)")) {
+                    newExpression = "$left×$symbol$right"
+                    newCurPos += 2
+                } else {
+                    newExpression = "$left$symbol$right"
+                    newCurPos += 1
+                }
+            }
+            // For infix operators like ^
+            symbol.startsWith("^") -> {
+                newExpression = "$left$symbol$right"
+                newCurPos += symbol.length
+            }
+            // Default case for other symbols
+            else -> {
+                newExpression = "$left$symbol$right"
+                newCurPos += symbol.length
+            }
+        }
+
+        expression = newExpression
+        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
+    }
+
+
+    // -------------------------------------------------------
+    // ERROR HANDLING
+    // -------------------------------------------------------
+    private fun handleErrors(errorMsg: String?, newResult: String) {
+        when (errorMsg) {
+            "invalid expression" -> appUtils.showToast(requireContext(), "Invalid expression")
+            "max digits" -> appUtils.showToast(requireContext(), "Max 12 digits in result")
+            "divide by zero" -> appUtils.showToast(requireContext(), "Cannot divide by zero")
+            else -> {
+                Log.e("testcat", "Error: $errorMsg")
+                appUtils.showToast(requireContext(), "An error occurred: $errorMsg")
+            }
+        }
+        result = newResult
+        displayResult()
+    }
+
+    private fun displayResult() {
+        if (isFinalResult) display.renderFinalResult(result)
+        else display.renderResult(result)
     }
 
     // -------------------------------------------------------

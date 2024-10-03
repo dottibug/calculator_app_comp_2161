@@ -12,6 +12,7 @@ class CalcUtils {
     }
 
     fun formatResult(value: String, decimalPlaces: Int): String {
+        if (value.isEmpty()) return ""
         return String.format(Locale.CANADA, "%.${decimalPlaces}f", value.toDouble())
             .trimEnd('0')
             .trimEnd('.')
@@ -102,8 +103,12 @@ class CalcUtils {
         val charLeft = left.lastOrNull()
         val charRight = right.firstOrNull()
 
-        if (charLeft in operators || charRight in operators) return true
-        else return false
+        if ((charLeft != null && charLeft in operators) || (charRight != null && charRight in
+            operators)) {
+            return true
+        } else {
+            return false
+        }
     }
 
     fun isOperatorAllowed(left: String, right: String, mode: String): Boolean {
@@ -128,14 +133,8 @@ class CalcUtils {
     // Check if the user has entered a number that contains more than one decimal
     fun hasInvalidDecimal(equation: String): Boolean {
         val numbers = equation.split(Regex("[$+~×÷]"))
-
-        numbers.forEach {
-            val decimalCount = it.count { char -> char == '.' }
-            if (decimalCount > 1) {
-                return true
-            }
-        }
-        return false
+        // Returns true if any number (it) contains a count of more than 1 decimal
+        return numbers.any { it.count { char -> char == '.' } > 1 }
     }
 
     data class DecimalExpression(
@@ -162,5 +161,12 @@ class CalcUtils {
     fun toggleNegativeSign(mode: String, expression: String, left: String, right: String,
         curPos: Int): Pair<String, Int> {
         return signUtils.toggleNegativeSign(mode, expression, left, right, curPos)
+    }
+
+    // Get the leftmost number in an expression before the cursor
+    fun extractLeftmostNumber(input: String): String {
+        val regex = Regex("^-?\\d*\\.?\\d+")
+        val matchResult = regex.find(input)
+        return matchResult?.value ?: ""
     }
 }

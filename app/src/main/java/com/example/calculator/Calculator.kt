@@ -1,6 +1,7 @@
 package com.example.calculator
 
 import android.content.Context
+import android.util.Log
 import androidx.fragment.app.Fragment
 
 // This is a parent class to the SimpleCalculator and ScientificCalculator classes. It uses the
@@ -27,31 +28,40 @@ abstract class Calculator : Fragment() {
             return
         }
 
-        result = when (mode) {
+        result = try{
+            when (mode) {
             "simple" -> if (exp == "-") { "" }
-                        else { simpleCalc.calculateLeftToRight(exp) }
+                        else { simpleCalc.calculateLeftToRight(exp, context) }
 
             "scientific" -> if (exp in setOf("(-", "abs((-", "(")) { "" }
                             else { scientificCalc.calculateBedmas(exp, context) }
 
-            else -> "error"
+                else -> throw Exception("invalid mode")
+            }
+        } catch (e: Exception) {
+            handleErrors(e.message, context)
         }
-        handleCalculationResult(context)
+
+        Log.i("testcat", "result: $result")
+
+        if (result != "error" && result.isNotEmpty()) {
+            result = calcUtils.formatResult(result, decimalPlaces)
+        }
+
+        displayResult()
     }
 
-    private fun handleCalculationResult(context: Context) {
-        when {
-            result == "error" -> appUtils.showToast(context, "Invalid expression")
-
-            calcUtils.hasTooManyDigits(result, decimalPlaces) -> {
-                appUtils.showToast(context, "Max 12 digits in result")
-            }
-
+    private fun handleErrors(errorMsg: String?, context: Context): String {
+        when (errorMsg) {
+            "invalid expression" -> { appUtils.showToast(context, "Invalid expression") }
+            "max digits" -> { appUtils.showToast(context, "Max 12 digits in result") }
+            "divide by zero" -> { appUtils.showToast(context, "Cannot divide by zero") }
             else -> {
-                result = calcUtils.formatResult(result, decimalPlaces)
-                displayResult()
+                Log.e("testcat", "Error: $errorMsg")
+                appUtils.showToast(context, "Invalid operation")
             }
         }
+        return "error"
     }
 
     private fun displayResult() {

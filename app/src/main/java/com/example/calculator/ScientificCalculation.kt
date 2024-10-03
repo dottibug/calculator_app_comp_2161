@@ -18,18 +18,18 @@ class ScientificCalculation {
     private val calcUtils = CalcUtils()
 
     fun calculateBedmas(expression: String, context: Context): String {
+
         val cleanExpression = cleanExpression(expression)
-        if (cleanExpression == "error") { return "error" }
-
         val postfixList = getPostfixList(cleanExpression, context)
-        if (postfixList.isEmpty()) { return "error" }
-
         val result = calculatePostfix(postfixList)
-        val formattedResult = calcUtils.formatResult(result, 10)
 
-        if (result == "error") { return "error" }
+        // Check number of digits in result
+        if (calcUtils.hasTooManyDigits(result, 10)) {
+            throw Exception("max digits")
+        }
 
-        return if (result == "error") { "error" } else { formattedResult }
+        return calcUtils.formatResult(result, 10)
+
     }
 
     private fun performPostfixOperation(num1: Double, num2: Double, operator: String): String {
@@ -37,7 +37,8 @@ class ScientificCalculation {
             "+" -> num1 + num2
             "~" -> num1 - num2
             "×" -> num1 * num2
-            "÷" -> if (num2 != 0.0) { num1 / num2 } else { Double.NaN.toString() }
+            "÷" -> if (num2 != 0.0) { num1 / num2 }
+                else { throw Exception("divide by zero") }
             else -> "error"
         }
         return result.toString()
@@ -257,23 +258,32 @@ class ScientificCalculation {
     }
 
     private fun calcAbsValue(expression: String): String {
-        if ("abs" !in expression) { return expression }
+        if ("|" !in expression) { return expression }
 
         var newExpression = expression
+        val absRegex = Regex("""\|([^|]+)\|""")
 
-        val absRegex = Regex("""abs\((\d+(\.\d+)?)\)""")
-        val numberRegex = Regex("""\d+(\.\d+)?""")
-
-        val absValues = absRegex.findAll(expression)
+        val absValues = absRegex.findAll(newExpression)
         for (absValue in absValues) {
             val abs = absValue.value
-            val number = numberRegex.find(abs)?.value?.toDouble()
+            val content = absValue.groupValues[1]
 
-            if (number == null) { return "error" }
+            try {
+                // Recursively calculate the content inside the absolute value
+                val innerResult = calculateBedmas(content, Context)
+                val number = innerResult.toDouble()
+                val result = abs(number)
+                val formattedResult = formatShortResult(result.toString())
+                newExpression = newExpression.replace(abs, formattedResult)
+            } catch (e: Exception) {
+                // If there's an error calculating the inner expression, return the original expression
+                return expression
+            }
+        }
 
-            val result = abs(number)
-            val formattedResult = formatShortResult(result.toString())
-            newExpression = newExpression.replace(abs, formattedResult)
+        // If there are any unclosed absolute value symbols, return the original expression
+        if (newExpression.count { it == '|' } % 2 != 0) {
+            return expression
         }
 
         return newExpression
