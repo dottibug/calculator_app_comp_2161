@@ -25,6 +25,10 @@ class ScientificCalculatorFragment : Calculator() {
         display = parentFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
     }
 
+    override fun getMode(): String {
+        return if (this is ScientificCalculatorFragment) "scientific" else "simple"
+    }
+
     private fun appendToFinalResult(bracket: String): Boolean {
         if (isFinalResult && result != "error") {
             expression = "${result}${bracket}"

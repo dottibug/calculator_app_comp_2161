@@ -3,14 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
     </data>
 
     <LinearLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/seasalt"
+        android:background="?android:attr/colorBackground"
         android:gravity="bottom"
         android:orientation="vertical"
         tools:context=".MainActivity">
@@ -19,25 +18,29 @@
             android:id="@+id/displayFragment"
             android:name="com.example.calculator.DisplayFragment"
             android:layout_width="match_parent"
-            android:layout_height="180dp" />
+            android:layout_height="wrap_content"
+            tools:layout="@layout/fragment_display" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/toolsFragment"
             android:name="com.example.calculator.ToolsFragment"
             android:layout_width="match_parent"
-            android:layout_height="58dp" />
+            android:layout_height="wrap_content"
+            tools:layout="@layout/fragment_tools" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/memoryFragment"
             android:name="com.example.calculator.MemoryFragment"
             android:layout_width="match_parent"
-            android:layout_height="58dp" />
+            android:layout_height="wrap_content"
+            tools:layout="@layout/fragment_memory" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/scientificCalculatorFragment"
             android:name="com.example.calculator.ScientificCalculatorFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            tools:layout="@layout/fragment_scientific_calculator" />
 
     </LinearLayout>
 

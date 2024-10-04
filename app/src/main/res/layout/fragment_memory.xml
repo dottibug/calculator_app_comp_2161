@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/seasalt"
+        android:background="?android:attr/colorBackground"
         tools:context=".MemoryFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,17 +29,21 @@
             <Button
                 android:id="@+id/buttonMemoryClear"
                 style="@style/memoryButtonStyle"
+                android:layout_width="0dp"
                 android:text="@string/memory_clear"
                 app:layout_constraintBottom_toBottomOf="@+id/buttonMemoryStore"
                 app:layout_constraintEnd_toStartOf="@+id/buttonMemoryStore"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/buttonMemoryStore" />
 
             <Button
                 android:id="@+id/buttonMemoryStore"
                 style="@style/memoryButtonStyle"
+                android:layout_width="0dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="2dp"
                 android:text="@string/memory_store"
                 app:layout_constraintBottom_toBottomOf="@+id/buttonMemoryRecall"
                 app:layout_constraintEnd_toStartOf="@+id/buttonMemoryRecall"
@@ -50,6 +54,9 @@
             <Button
                 android:id="@+id/buttonMemoryRecall"
                 style="@style/memoryButtonStyle"
+                android:layout_width="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:text="@string/memory_recall"
                 app:layout_constraintBottom_toBottomOf="@+id/buttonMemoryAdd"
                 app:layout_constraintEnd_toStartOf="@+id/buttonMemoryAdd"
@@ -60,6 +67,9 @@
             <Button
                 android:id="@+id/buttonMemoryAdd"
                 style="@style/memoryButtonStyle"
+                android:layout_width="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp"
                 android:text="@string/memory_add"
                 app:layout_constraintBottom_toBottomOf="@+id/buttonMemorySubtract"
                 app:layout_constraintEnd_toStartOf="@+id/buttonMemorySubtract"
@@ -70,6 +80,7 @@
             <Button
                 android:id="@+id/buttonMemorySubtract"
                 style="@style/memoryButtonStyle"
+                android:layout_width="0dp"
                 android:text="@string/memory_subtract"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

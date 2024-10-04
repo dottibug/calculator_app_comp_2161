@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_simpleModeFragment_to_scientificModeFragment"
             app:destination="@id/scientificModeFragment" />
+        <action
+            android:id="@+id/action_simpleModeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/scientificModeFragment"
@@ -18,6 +21,20 @@
         android:label="ScientificModeFragment" >
         <action
             android:id="@+id/action_scientificModeFragment_to_simpleModeFragment"
+            app:destination="@id/simpleModeFragment" />
+        <action
+            android:id="@+id/action_scientificModeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.calculator.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_scientificModeFragment"
+            app:destination="@id/scientificModeFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_simpleModeFragment"
             app:destination="@id/simpleModeFragment" />
     </fragment>
 </navigation>

@@ -28,6 +28,10 @@ class SimpleCalculatorFragment : Calculator() {
         display = parentFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
     }
 
+    override fun getMode(): String {
+        return if (this is SimpleCalculatorFragment) "simple" else "scientific"
+    }
+
     // Handle backspace click
     fun onBackspace() {
         val (curPos, left, right) = calcUtils.getParts(display, expression)

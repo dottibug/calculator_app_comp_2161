@@ -1,0 +1,25 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/messages_header">
+
+        <SwitchPreferenceCompat
+            app:key="dark_mode"
+            app:title="Dark Mode"
+            app:summary="Enable dark theme" />
+
+        <EditTextPreference
+            app:key="decimal_places"
+            app:title="Decimal Places"
+            app:summary="Set the number of decimal places"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="10" />
+
+        <SwitchPreferenceCompat
+            app:key="always_scientific"
+            app:title="Always Launch Scientific"
+            app:summary="Launch the app in scientific mode" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/seasalt"
+        android:background="?android:attr/colorBackground"
         android:paddingTop="0dp"
         android:paddingBottom="0dp"
         tools:context=".DisplayFragment">
@@ -22,7 +22,7 @@
             android:paddingEnd="18dp"
             android:text="@string/result"
             android:textAlignment="viewEnd"
-            android:textColor="@color/slateGray"
+            android:textColor="?attr/colorOnBackground"
             android:textSize="44sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +44,7 @@
             android:paddingEnd="18dp"
             android:paddingBottom="18dp"
             android:scrollbars="vertical"
-            android:textColor="@color/slateGray"
+            android:textColor="?attr/colorOnBackground"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

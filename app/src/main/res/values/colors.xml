@@ -9,6 +9,7 @@
     <color name="slateGray">#80909D</color>
     <color name="steelBlue">#4489BD</color>
     <color name="carolinaBlue">#8BAFCB</color>
+    <color name="violet">#AD94C2</color>
 
     <!-- TODO Pick a color for the operators -->
     <color name="moonstone">#4D9CAE</color>

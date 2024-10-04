@@ -1,7 +1,27 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Calculator" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Night Mode -->
+        <item name="colorPrimary">@color/carolinaBlue</item>
+        <item name="colorPrimaryVariant">@color/steelBlue</item>
+        <item name="colorOnPrimary">@color/seasalt</item>
+
+        <item name="colorSecondary">@color/seasalt</item>
+
+        <item name="colorButtonNormal">@color/platinum</item>
+
+        <item name="colorTertiary">@color/slateGray</item>
+
+        <item name="android:colorBackground">@color/jet</item>
+        <item name="colorOnBackground">@color/seasalt</item>
+
+        <item name="colorError">@color/poppy</item>
+        <item name="colorOnError">@color/seasalt</item>
+
+        <item name="android:textColorPrimary">@color/jet</item>
+
+        <!-- Hide keyboard on app launch -->
+        <item name="android:windowSoftInputMode">stateHidden</item>
     </style>
+
 </resources>

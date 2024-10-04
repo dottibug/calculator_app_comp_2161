@@ -8,8 +8,8 @@
         <item name="android:fontFamily">@font/roboto</item>
         <item name="android:textSize">28sp</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:backgroundTint">@color/platinum</item>
-        <item name="android:textColor">@color/jet</item>
+        <item name="android:backgroundTint">?attr/colorButtonNormal</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <!-- SIMPLE CALCULATOR STYLES -->
@@ -22,20 +22,20 @@
 
     <!-- Simple Clear Button -->
     <style name="simpleClearButton" parent="simpleButton">
-        <item name="android:textColor">@color/poppy</item>
+        <item name="android:textColor">?attr/colorError</item>
     </style>
 
     <!-- Simple Operator Button -->
     <style name="simpleOperator" parent="simpleButton">
-        <item name="android:backgroundTint">@color/carolinaBlue</item>
-        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">32sp</item>
     </style>
 
     <!-- Simple Equals Button -->
     <style name="simpleEquals" parent="simpleOperator">
-        <item name="android:backgroundTint">@color/steelBlue</item>
-        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:backgroundTint">?attr/colorPrimaryVariant</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">32sp</item>
     </style>
 
@@ -51,41 +51,24 @@
 
     <!-- Scientific Clear Button -->
     <style name="scientificClearButton" parent="scientificButton">
-        <item name="android:textColor">@color/poppy</item>
+        <item name="android:textColor">?attr/colorError</item>
     </style>
 
     <!-- Scientific Operator Button -->
     <style name="scientificOperator" parent="scientificButton">
-        <item name="android:backgroundTint">@color/carolinaBlue</item>
-        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">32sp</item>
         <item name="android:padding">8dp</item>
     </style>
 
     <!-- Scientific Equals Button -->
     <style name="scientificEquals" parent="scientificOperator">
-        <item name="android:backgroundTint">@color/steelBlue</item>
-        <item name="android:textColor">@color/seasalt</item>
+        <item name="android:backgroundTint">?attr/colorPrimaryVariant</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">32sp</item>
         <item name="android:padding">8dp</item>
     </style>
-
-
-<!--    ///////-->
-
-    <!-- Number Button Style (Night Mode) -->
-    <!-- TODO Add Night Mode -->
-
-    <!-- Clear Button Style (Night Mode) -->
-    <!-- TODO Add Night Mode -->
-
-    <!-- Operator Button Style -->
-    <!-- Operator Button Style (Night Mode) -->
-    <!-- TODO Add Night Mode -->
-
-    <!-- Equals Button Style -->
-    <!-- Equals Button Style (Night Mode) -->
-    <!-- TODO Add Night Mode -->
 
     <!-- Memory Button Style -->
     <style name="memoryButtonStyle" parent="@style/Widget.Material3.Button.IconButton.Filled.Tonal">
@@ -95,13 +78,10 @@
         <item name="android:height">54dp</item>
         <item name="android:fontFamily">@font/roboto</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/jet</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:backgroundTint">@color/platinum</item>
+        <item name="android:backgroundTint">?attr/colorButtonNormal</item>
     </style>
-
-    <!-- Memory Button Style (Night Mode) -->
-    <!-- TODO Add Night Mode -->
 
     <!-- Tools Button Style -->
     <style name="toolsButtonStyle" parent="@style/Widget.Material3.Button.IconButton.Filled.Tonal">
@@ -109,21 +89,17 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:width">54dp</item>
         <item name="android:height">54dp</item>
-        <item name="android:textColor">@color/jet</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:backgroundTint">@color/platinum</item>
+        <item name="android:backgroundTint">?attr/colorButtonNormal</item>
         <item name="iconGravity">textTop</item>
     </style>
-
-    <!-- Tools Button Style -->
-    <!-- TODO Add Night Mode -->
 
     <!-- Divider -->
     <style name="dividerStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
-        <item name="android:background">@color/slateGray</item>
+        <item name="android:background">?attr/colorTertiary</item>
     </style>
-
 
 </resources>

@@ -1,8 +1,11 @@
 package com.example.calculator
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 
 // This is a parent class to the SimpleCalculator and ScientificCalculator classes. It uses the
 // MemoryCallback interface to handle communication
@@ -19,10 +22,15 @@ abstract class Calculator : Fragment() {
     protected val signUtils = SignToggleUtils()
     protected val simpleCalc = SimpleCalculation()
     protected val scientificCalc = ScientificCalculation()
+    protected lateinit var sharedPreferences: SharedPreferences
+
 
     // Calculate result of an expression based on calculator mode. Simple mode calculates from
     // left to right (ignoring BEDMAS order of operations), while scientific mode uses BEDMAS.
-    private fun calculate(exp: String, mode: String, context: Context) {
+    fun calculate(exp: String, mode: String, context: Context) {
+        // Update decimal places if user changes it in settings
+        updateDecimalPlaces()
+
         if (exp.isEmpty()) {
             result = ""
             displayResult()
@@ -69,6 +77,7 @@ abstract class Calculator : Fragment() {
 
     // Render the expression and calculated result in the display fragment
     protected fun calcResultAndRefreshDisplay(exp: String, curPos: Int, curOffset: Int, mode: String) {
+        updateDecimalPlaces()
         display.renderExpression(exp, curPos, curOffset)
 
         if ((exp.isEmpty() && result.isEmpty()) || exp in setOf("-", "(-", "(")) {
@@ -269,4 +278,37 @@ abstract class Calculator : Fragment() {
         isFinalResult = false
         appUtils.showToast(requireContext(), response)
     }
+
+
+    // ---------------------------------------------------------------------
+    // OVERRIDE METHODS - Handle preferences and state
+    // ---------------------------------------------------------------------
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        updateDecimalPlaces()
+    }
+
+    fun updateDecimalPlaces() {
+        decimalPlaces = sharedPreferences.getString("decimal_places", "10")?.toIntOrNull() ?: 10
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("expression", expression)
+        outState.putString("result", result)
+        outState.putString("memory", memory)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) {
+            expression = savedInstanceState.getString("expression", "")
+            result = savedInstanceState.getString("result", "")
+            memory = savedInstanceState.getString("memory", "")
+        }
+    }
+
+    // Method to be defined in child classes
+    abstract fun getMode(): String
 }

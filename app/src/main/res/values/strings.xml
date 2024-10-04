@@ -61,4 +61,8 @@
     <string name="add">+</string>
     <string name="equals">=</string>
 
+    <!-- Preference Titles -->
+    <string name="messages_header">Calculator Settings</string>
+    <string name="sync_header">Sync</string>
+
 </resources>
