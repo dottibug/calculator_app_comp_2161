@@ -7,9 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.calculator.databinding.FragmentScientificCalculatorBinding
 
-// TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateBEDMAS
-//  functions)
-
 // NOTE: The scientific calculator uses BEDMAS order of operations to calculate the result
 class ScientificCalculatorFragment : Calculator() {
     private lateinit var binding: FragmentScientificCalculatorBinding
@@ -106,12 +103,6 @@ class ScientificCalculatorFragment : Calculator() {
         // Delete the character at the cursor position
         val updatedLeft = left.dropLast(1)
 
-        // If the right of cursor is a decimal, add a leading zero
-//        if (updatedRight.isNotEmpty() && updatedRight.first() == '.' && updatedLeft.last()
-//            in setOf('+', '~', '×', '÷')) {
-//            updatedRight = "0$updatedRight"
-//        }
-
         expression = "$updatedLeft$right"
         calcResultAndRefreshDisplay(expression, curPos - 1, 0, mode)
     }
@@ -120,117 +111,10 @@ class ScientificCalculatorFragment : Calculator() {
     // SCIENTIFIC BUTTONS
     // -------------------------------------------------------
 
-    private val addMultSymbolToLeftPart = setOf(")", "π", "e", "!", "^(2)", "^(3)")
-    private val addMultSymbolToRightPart = setOf("(", "√(", "π", "e", "abs(", "sin(", "cos(", "tan(")
-
-    private fun appendSymbol2(symbol: String) {
-        var newSymbol = symbol
-        val (curPos, left, right) = calcUtils.getParts(display, expression)
-
-        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any { left.endsWith(it) })) {
-            if (newSymbol in setOf("π", "e", "sin(", "cos(", "tan(", "abs(", "√(")) {
-                newSymbol = "×$newSymbol"
-            }
-        }
-
-        expression = "$left$newSymbol$right"
-        val newCurPos = curPos + newSymbol.length
-        display.renderExpression(expression, newCurPos, 0)
-    }
-
-
-    // Returns true if the input ends with any of the math symbols
-    private fun appendMultiplySymbol(symbol: String, left: String, right: String): String {
-
-        var newSymbol = symbol
-        val exponents = setOf("^(2)", "^(3)")
-
-        if (left.isNotEmpty() && (left.last().isDigit() || addMultSymbolToLeftPart.any { left.endsWith(it) })) {
-            if (newSymbol in setOf("π", "e", "sin(", "cos(", "tan(", "abs(", "√(")) {
-                newSymbol = "×$newSymbol"
-            }
-        }
-
-        if (right.isNotEmpty() && (right.first().isDigit() || addMultSymbolToRightPart.any
-            { right.startsWith(it) })) {
-            newSymbol = "$newSymbol×"
-        }
-        return newSymbol
-    }
-
-//    private fun appendSymbolAndCalculate(symbol: String) {
-//        val (curPos, left, right) = calcUtils.getParts(display, expression)
-////        val newSymbol = appendMultiplySymbol(symbol, left, right)
-//        expression = "$left$symbol$right"
-//        val newCurPos = curPos + symbol.length
-//        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
-//    }
-
     // Handle special number button clicks
     private fun onConstantClick(number: String) {
         val constantSymbol = if (number == "pi") "π" else "e"
         appendSymbolAndCalculate(constantSymbol)
-    }
-
-    // Handle trig function click
-    private fun onTrigClick(trigFunction: String) {
-        var trigSymbol = ""
-        when (trigFunction) {
-            "sin" -> trigSymbol = "sin("
-            "cos" -> trigSymbol = "cos("
-            "tan" -> trigSymbol = "tan("
-        }
-//        appendSymbol(trigSymbol)
-    }
-
-    // Handle square root click
-    private fun onSquareRootClick() {
-        val squareRoot = "√("
-//        appendSymbol(squareRoot)
-    }
-
-    // Handle exponent click
-    private fun onExponentClick(exponent: String) {
-        val exponentSymbol = if (exponent == "square") { "^(2)" } else { "^(3)" }
-        appendSymbolAndCalculate(exponentSymbol)
-    }
-
-    private fun onAbsClick() {
-        val (curPos, left, right) = calcUtils.getParts(display, expression)
-
-        if (right.isEmpty() || !right.contains('|')) {
-            expression = "$left|$right"
-            val newCurPos = curPos + 1
-            display.renderExpression(expression, newCurPos, 0)
-        } else {
-            appendSymbolAndCalculate("|")
-        }
-    }
-
-    // Handle absolute value click
-    private fun onAbsClick2() {
-        val (curPos, left, right) = calcUtils.getParts(display, expression)
-
-        // Allows user to close the absolute value function
-        if (left.count { it == '|' } % 2 != 0) {
-            appendSymbolAndCalculate("|")
-            return
-        }
-
-        // Check for invalid position to put absolute value symbol
-        if (left.isNotEmpty()) {
-            val last = left.last()
-            val invalidChars = setOf(')', '!', 'e', 'π')
-            val invalidEndings = listOf("sin(", "cos(", "tan(", "^(2)", "^(3)", "√(")
-
-            // Add multiplication symbol next to invalid character or endings
-            if (last.isDigit() || last in invalidChars || invalidEndings.any { left.endsWith(it) }) {
-                appendSymbolAndCalculate("×|")
-                return
-            }
-        }
-
-        appendSymbolAndCalculate("|")
     }
 
     // Handle factorial click
@@ -271,44 +155,47 @@ class ScientificCalculatorFragment : Calculator() {
         var newExpression = expression
         var newCurPos = curPos
 
-        // Handle different types of symbols
-        when {
-            // For postfix operators like factorial
-            symbol == "!" -> {
+        val multiply = "×"
+
+        when (symbol) {
+            // Factorial
+            "!" -> {
                 newExpression = "$left$symbol$right"
                 newCurPos += 1
             }
-            // For prefix functions like sin, cos, tan, abs, sqrt
-            symbol in listOf("sin(", "cos(", "tan(", "abs(", "√(") -> {
+
+            // Constant
+            in listOf("π", "e") -> {
                 // Add multiplication symbol if needed
-                if (left.isNotEmpty() && (left.last().isDigit() || left.last() in "πe)")) {
-                    newExpression = "$left×$symbol$right"
-                    newCurPos += symbol.length + 1
-                } else {
-                    newExpression = "$left$symbol$right"
-                    newCurPos += symbol.length
+                if (left.isNotEmpty() && right.isNotEmpty()) {
+                    // If left and right chars are digits or specified symbols, add a
+                    // multiplication symbol on each side of the constant
+                    if ((left.last().isDigit() || left.last() in "πe)!.")
+                        && (right.first().isDigit() || right.first() in "πe(.")) {
+                        newExpression = "$left$multiply$symbol$multiply$right"
+                        newCurPos += 3
+                    }
                 }
-            }
-            // For constants like π and e
-            symbol in listOf("π", "e") -> {
-                // Add multiplication symbol if needed
-                if (left.isNotEmpty() && (left.last().isDigit() || left.last() in "πe)")) {
-                    newExpression = "$left×$symbol$right"
+                // If only the left char is a digit or specified symbol, add a multiplication
+                // symbol before the constant
+                else if (left.isNotEmpty() && (left.last().isDigit() || left.last() in "πe)!.")) {
+                    newExpression = "$left$multiply$symbol$right"
                     newCurPos += 2
-                } else {
+                }
+
+                // If only the right char is a digit or specified symbol, add a multiplication
+                // symbol after the constant
+                else if (right.isNotEmpty() && (right.first().isDigit() ||
+                        right.first() in "πe(.")) {
+                    newExpression = "$left$symbol$multiply$right"
+                    newCurPos += 2
+                }
+
+                // If neither char is a digit or specified symbol, simply add the constant
+                else {
                     newExpression = "$left$symbol$right"
                     newCurPos += 1
                 }
-            }
-            // For infix operators like ^
-            symbol.startsWith("^") -> {
-                newExpression = "$left$symbol$right"
-                newCurPos += symbol.length
-            }
-            // Default case for other symbols
-            else -> {
-                newExpression = "$left$symbol$right"
-                newCurPos += symbol.length
             }
         }
 
@@ -381,13 +268,6 @@ class ScientificCalculatorFragment : Calculator() {
     private fun setupScientificButtons() {
         binding.buttonPi.setOnClickListener { onConstantClick("pi") }
         binding.buttonEuler.setOnClickListener { onConstantClick("euler") }
-        binding.buttonSin.setOnClickListener { onTrigClick("sin") }
-        binding.buttonCos.setOnClickListener { onTrigClick("cos") }
-        binding.buttonTan.setOnClickListener { onTrigClick("tan") }
-        binding.buttonSquareRoot.setOnClickListener { onSquareRootClick() }
-        binding.buttonSquare.setOnClickListener { onExponentClick("square") }
-        binding.buttonCube.setOnClickListener { onExponentClick("cube") }
-        binding.buttonAbs.setOnClickListener { onAbsClick() }
         binding.buttonFactorial.setOnClickListener { onFactorialClick() }
     }
 }

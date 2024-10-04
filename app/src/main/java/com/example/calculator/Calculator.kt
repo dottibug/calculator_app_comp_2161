@@ -16,52 +16,50 @@ abstract class Calculator : Fragment() {
     protected val memoryManager = Memory()
     protected val appUtils = AppUtils()
     protected val calcUtils = CalcUtils()
+    protected val signUtils = SignToggleUtils()
     protected val simpleCalc = SimpleCalculation()
     protected val scientificCalc = ScientificCalculation()
 
     // Calculate result of an expression based on calculator mode. Simple mode calculates from
     // left to right (ignoring BEDMAS order of operations), while scientific mode uses BEDMAS.
-    fun calculate(exp: String, mode: String, context: Context) {
+    private fun calculate(exp: String, mode: String, context: Context) {
         if (exp.isEmpty()) {
             result = ""
             displayResult()
             return
         }
 
-        result = try{
+        try {
             when (mode) {
-            "simple" -> if (exp == "-") { "" }
+            "simple" -> result = if (exp == "-") { "" }
                         else { simpleCalc.calculateLeftToRight(exp, context) }
 
-            "scientific" -> if (exp in setOf("(-", "abs((-", "(")) { "" }
+            "scientific" -> result = if (exp in setOf("(-", "abs((-", "(")) { "" }
                             else { scientificCalc.calculateBedmas(exp, context) }
 
                 else -> throw Exception("invalid mode")
             }
-        } catch (e: Exception) {
-            handleErrors(e.message, context)
-        }
+        } catch (e: Exception) { handleErrors(e.message, context) }
 
-        Log.i("testcat", "result: $result")
+        Log.i("testcat", "RESULT: $result")
 
         if (result != "error" && result.isNotEmpty()) {
             result = calcUtils.formatResult(result, decimalPlaces)
         }
-
         displayResult()
     }
 
-    private fun handleErrors(errorMsg: String?, context: Context): String {
+    private fun handleErrors(errorMsg: String?, context: Context) {
         when (errorMsg) {
             "invalid expression" -> { appUtils.showToast(context, "Invalid expression") }
-            "max digits" -> { appUtils.showToast(context, "Max 12 digits in result") }
+            "max digits" -> { appUtils.showToast(context, "Maximum digits in result") }
             "divide by zero" -> { appUtils.showToast(context, "Cannot divide by zero") }
             else -> {
                 Log.e("testcat", "Error: $errorMsg")
                 appUtils.showToast(context, "Invalid operation")
             }
         }
-        return "error"
+        result = "error"
     }
 
     private fun displayResult() {
@@ -82,70 +80,80 @@ abstract class Calculator : Fragment() {
 
     // Handle number clicks
     protected fun onNumberClick(number: String, mode: String) {
-        if (isFinalResult) expression = ""
+        var newCurPos = 0
 
-        var (cursorPos, left, right) = calcUtils.getParts(display, expression)
-        expression = "$left$number$right"
+        if (isFinalResult) {
+            expression = number
+            newCurPos = expression.length
+            isFinalResult = false
+        } else {
+            val (cursorPos, left, right) = calcUtils.getParts(display, expression)
+            newCurPos = cursorPos
 
-        val cursorOffset = if (isFinalResult) 0 else 1
-        cursorPos = if (isFinalResult) 1 else cursorPos
+            if (left.isNotEmpty() && left.last() in "πe!") {
+                val times = "×"
+                expression = "$left$times$number$right"
+                newCurPos += 2
+            } else {
+                expression = "$left$number$right"
+                newCurPos += number.length
+            }
+        }
 
-        isFinalResult = false
-        calcResultAndRefreshDisplay(expression, cursorPos, cursorOffset, mode)
+        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
     }
 
     // Handle operator clicks
     protected fun onOperatorClick(operator: String, mode: String) {
-        var cursorOffset = 0
-        var (cursorPos, left, right) = calcUtils.getParts(display, expression)
+        val (cursorPos, left, right) = calcUtils.getParts(display, expression)
+        var newCurPos = cursorPos
 
-        if (!calcUtils.isOperatorAllowed(left, right, mode)) {
-            return
-        }
+        if (!calcUtils.isOperatorAllowed(left, right, mode)) { return }
 
         // Start new expression with result if user enters operator after a final result is shown
         if (isFinalResult && result != "error") {
             expression = "$result$operator"
-            cursorPos = expression.length
-        }
-
-        // Add trailing 0 if user enters an operator beside a decimal
-        if (left.isNotEmpty() && left.last() == '.' && right.isEmpty()) {
+            newCurPos = expression.length
+            isFinalResult = false
+        } else if (left.isNotEmpty() && left.last() == '.' && right.isEmpty()) {
+            // Add trailing 0 if user enters an operator beside a decimal
             expression = calcUtils.addTrailingZero(left, operator)
-            cursorOffset = 2
+            newCurPos += 2
         } else {
             expression = "$left$operator$right"
-            cursorOffset = 1
+            newCurPos += 1
         }
-
-        calcResultAndRefreshDisplay(expression, cursorPos, cursorOffset, mode)
+        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
     }
 
     // Handle decimal clicks
     protected fun onDecimalClick(mode: String) {
         val decimal = "."
+        var newCurPos = 0
 
-        if (isFinalResult && result.contains('.')) {
-            expression = result
-        } else if (isFinalResult && !result.contains('.')) {
-            expression = "$result$decimal"
-        }
-
-        isFinalResult = false
-
-        var cursorOffset = 0
-        val (cursorPos, left, right) = calcUtils.getParts(display, expression)
-
-        // Prevent user from entering numbers with more than one decimal
-        if (calcUtils.hasInvalidDecimal("$left$decimal$right")) {
-            expression = "$left$right"
+        // If user clicks decimal after final result is shown, start new expression with the
+        // final result (checks that user does not enter more than one decimal point)
+        if (isFinalResult) {
+            when {
+                result.contains('.') -> expression = result
+                else -> expression = "$result$decimal"
+            }
+            newCurPos = expression.length
+            isFinalResult = false
         } else {
-            val (decimalExpression, leadingZeroAdded) = calcUtils.getDecimalExpression(left, right)
-            expression = decimalExpression
-            cursorOffset = if (leadingZeroAdded) 2 else 1
-        }
+            val (cursorPos, left, right) = calcUtils.getParts(display, expression)
+            newCurPos = cursorPos
 
-        calcResultAndRefreshDisplay(expression, cursorPos, cursorOffset, mode)
+            // Prevent user from entering numbers with more than one decimal
+            if (calcUtils.hasInvalidDecimal("$left$decimal$right")) {
+                expression = "$left$right"
+            } else {
+                val (newExpression, leadingZeroAdded) = calcUtils.addLeadingZero(left, right)
+                expression = newExpression
+                newCurPos = if (leadingZeroAdded) { newCurPos + 2 } else { newCurPos + 1 }
+            }
+        }
+        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
     }
 
     private fun startExpressionWithSignedResult(result: String, mode: String): String {
@@ -170,21 +178,23 @@ abstract class Calculator : Fragment() {
     }
 
     protected fun onSignClick(mode: String) {
-        var (curPos, left, right) = calcUtils.getParts(display, expression)
+        var newCurPos = 0
 
         // If user clicks sign after final result is shown, start new expression with the result,
         // changing its sign
         if (isFinalResult && result != "error") {
             expression = startExpressionWithSignedResult(result, mode)
-            curPos = expression.length
+            newCurPos = expression.length
             isFinalResult = false
+        } else {
+            val (curPos, left, right) = calcUtils.getParts(display, expression)
+            newCurPos = curPos
+
+            val (newExpression, offset) = signUtils.toggleSign(mode, expression, left, right, curPos)
+            newCurPos = newCurPos + offset
+            expression = newExpression
         }
-
-        val (newExpression, newCursorOffset) = calcUtils.toggleNegativeSign(mode, expression, left,
-            right, curPos)
-
-        expression = newExpression
-        calcResultAndRefreshDisplay(expression, curPos, newCursorOffset, mode)
+        calcResultAndRefreshDisplay(expression, newCurPos, 0, mode)
     }
 
     protected fun onEqualClick(mode: String) {
@@ -210,6 +220,11 @@ abstract class Calculator : Fragment() {
         result = ""
         isFinalResult = false
         calcResultAndRefreshDisplay(expression, 0, 0, mode)
+    }
+
+    protected fun showErrorToastAndReturn() {
+        appUtils.showToast(requireContext(), "Please clear calculator error")
+        return
     }
 
     // MEMORY FUNCTIONS //

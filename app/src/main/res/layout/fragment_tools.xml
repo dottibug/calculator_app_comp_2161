@@ -16,10 +16,15 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayoutToolButtons"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:paddingStart="18dp"
+            android:paddingTop="0dp"
             android:paddingEnd="18dp"
-            tools:layout_editor_absoluteX="18dp">
+            android:paddingBottom="3dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <Button
                 android:id="@+id/buttonSettings"
@@ -35,7 +40,8 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
             <Button
                 android:id="@+id/buttonDarkMode"
@@ -46,11 +52,12 @@
                 app:icon="@drawable/darkmode_jet"
                 app:iconSize="24dp"
                 app:iconTint="@color/jet"
-                app:layout_constraintBottom_toBottomOf="@+id/buttonSettings"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/buttonCalculatorMode"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/buttonSettings"
-                app:layout_constraintTop_toTopOf="@+id/buttonSettings" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
             <Button
                 android:id="@+id/buttonCalculatorMode"
@@ -61,11 +68,12 @@
                 app:icon="@drawable/scientific_jet"
                 app:iconSize="24dp"
                 app:iconTint="@color/jet"
-                app:layout_constraintBottom_toBottomOf="@+id/buttonDarkMode"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/buttonConversion"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/buttonDarkMode"
-                app:layout_constraintTop_toTopOf="@+id/buttonDarkMode" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
             <Button
                 android:id="@+id/buttonConversion"
@@ -76,11 +84,12 @@
                 app:icon="@drawable/convert_jet"
                 app:iconSize="24dp"
                 app:iconTint="@color/jet"
-                app:layout_constraintBottom_toBottomOf="@+id/buttonCalculatorMode"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/buttonBackspace"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/buttonCalculatorMode"
-                app:layout_constraintTop_toTopOf="@+id/buttonCalculatorMode" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
             <Button
                 android:id="@+id/buttonBackspace"
@@ -93,11 +102,12 @@
                 app:icon="@drawable/backspace_jet"
                 app:iconSize="24dp"
                 app:iconTint="@color/poppy"
-                app:layout_constraintBottom_toBottomOf="@+id/buttonConversion"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/buttonConversion"
-                app:layout_constraintTop_toTopOf="@+id/buttonConversion" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -109,7 +119,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutToolButtons" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutToolButtons"
+            app:layout_constraintVertical_bias="0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

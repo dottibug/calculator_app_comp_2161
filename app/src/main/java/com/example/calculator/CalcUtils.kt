@@ -3,8 +3,6 @@ package com.example.calculator
 import java.util.Locale
 
 class CalcUtils {
-    private val signUtils = SignToggleUtils()
-
     fun isNumber(number: String): Boolean {
         if (number.isEmpty()) return false
         if (number == "-" || number == "(" || number == "(-") return false
@@ -18,19 +16,24 @@ class CalcUtils {
             .trimEnd('.')
     }
 
-    fun hasTooManyDigits(number: String, decimalPlaces: Int): Boolean {
-        if (number.isEmpty()) return false
+    fun hasTooManyDigits(number: String, maxDigits: Int): Boolean {
+        // Trim leading and trailing zeros
+        val trimNum = number.trimStart('0').trimEnd('0')
 
-        var digitCount = 0
-        val formatNumber = formatResult(number, decimalPlaces)
+        // Split by "." to get the integer and decimal parts
+        val parts = trimNum.split(".")
+        val integers = parts[0]
+        val decimals = parts.getOrNull(1) ?: "" // null if no decimal in number
 
-        // Count the digits in the unformatted number (so decimal places are not limited)
-        if (formatNumber.contains(".")) digitCount = number.count { it.isDigit() }
+        // Count the digits in the integer and decimal parts
+        val intDigits = integers.length
+        val decDigits = decimals.length
 
-        // Count the digits in the formatted number so trailing zeros are not counted
-        else digitCount = formatResult(number, decimalPlaces).count { it.isDigit() }
+        // Add up the total digits
+        val totalDigits = intDigits + decDigits
 
-        return digitCount > 12
+        // If the total digits is greater than the max digits, return true
+        return totalDigits > maxDigits
     }
 
     private fun removeBrackets(input: String): String {
@@ -97,37 +100,25 @@ class CalcUtils {
         return "$left$zero$operator"
     }
 
-    private fun hasDoubleOperators(left: String, right: String): Boolean {
+    // Check if the user has entered an invalid operator. Cannot enter operator:
+    // 1. As the first char in an expression
+    // 2. Immediately after an operator
+    // 3. Immediately after a negative sign
+    // 4. Immediately after an open bracket
+    // 5. Immediately before an operator
+    // 6. Immediately before a factorial symbol
+    fun isOperatorAllowed(left: String, right: String, mode: String): Boolean {
         val operators = setOf('+', '~', '×', '÷')
 
-        val charLeft = left.lastOrNull()
-        val charRight = right.firstOrNull()
-
-        if ((charLeft != null && charLeft in operators) || (charRight != null && charRight in
-            operators)) {
-            return true
-        } else {
-            return false
+        return when {
+            left.isEmpty() -> false
+            left.isNotEmpty() && left.last() in operators -> false
+            left.isNotEmpty() && left.last() == '-' -> false
+            left.isNotEmpty() && left.last() == '(' -> false
+            right.isNotEmpty() && right.first() in operators -> false
+            right.isNotEmpty() && right.first() == '!' -> false
+            else -> true
         }
-    }
-
-    fun isOperatorAllowed(left: String, right: String, mode: String): Boolean {
-        // Prevent user from entering an operator as the first char in the equation
-        if (left.isEmpty()) {
-            return false
-        }
-
-        // Prevent user from entering two operators in a row
-        if (hasDoubleOperators(left, right)) {
-            return false
-        }
-
-        // Prevent user from entering an operator to the right of an open bracket
-        if (mode == "scientific" && left.isNotEmpty() && left.last() == '(') {
-            return false
-        }
-
-        return true
     }
 
     // Check if the user has entered a number that contains more than one decimal
@@ -138,12 +129,12 @@ class CalcUtils {
     }
 
     data class DecimalExpression(
-        val decimalExpression: String,
+        val newExpression: String,
         val leadingZeroAdded: Boolean
     )
 
-    // Formats a decimal expression with a leading zero if necessary
-    fun getDecimalExpression(left: String, right: String): DecimalExpression {
+    // Formats a decimal number in the expression with a leading zero if necessary
+    fun addLeadingZero(left: String, right: String): DecimalExpression {
         var leadingZeroAdded = false
         var decimalExpression = ""
 
@@ -155,12 +146,6 @@ class CalcUtils {
             decimalExpression = "$left.$right"
         }
         return DecimalExpression(decimalExpression, leadingZeroAdded)
-    }
-
-    // Toggles negative sign in an expression
-    fun toggleNegativeSign(mode: String, expression: String, left: String, right: String,
-        curPos: Int): Pair<String, Int> {
-        return signUtils.toggleNegativeSign(mode, expression, left, right, curPos)
     }
 
     // Get the leftmost number in an expression before the cursor

@@ -10,7 +10,7 @@ class SimpleCalculation {
     fun calculateLeftToRight(expression: String, context: Context): String {
         if (expression.isEmpty()) return ""
 
-        val operators = setOf('+', '~', '×', '÷')
+        val operators = setOf('+', '~', '×', '÷', '-')
 
         var number = ""
         var operator = '+'
@@ -47,7 +47,7 @@ class SimpleCalculation {
         }
 
         // Check number of digits in result
-        if (calcUtils.hasTooManyDigits(result.toString(), 10)) {
+        if (calcUtils.hasTooManyDigits(result.toString(), 24)) {
             throw Exception("max digits")
         }
 

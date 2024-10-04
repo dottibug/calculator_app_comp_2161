@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/seasalt"
+        android:gravity="bottom"
         android:orientation="vertical"
         tools:context=".MainActivity">
 
@@ -18,29 +19,25 @@
             android:id="@+id/displayFragment"
             android:name="com.example.calculator.DisplayFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4" />
+            android:layout_height="180dp" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/toolsFragment"
             android:name="com.example.calculator.ToolsFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/memoryFragment"
             android:name="com.example.calculator.MemoryFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/simpleCalculatorFragment"
             android:name="com.example.calculator.SimpleCalculatorFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

@@ -45,7 +45,7 @@
     <style name="scientificButton" parent="mainButton">
         <item name="android:width">60dp</item>
         <item name="android:height">60dp</item>
-        <item name="android:textSize">26sp</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 

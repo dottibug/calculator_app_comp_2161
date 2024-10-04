@@ -1,13 +1,6 @@
 package com.example.calculator
 
 import android.content.Context
-import java.lang.Math.toRadians
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
-import kotlin.math.tan
 
 // This class contains the logic for the scientific calculator
 // It calculates the result of the equation using BEDMAS order of operations
@@ -24,7 +17,7 @@ class ScientificCalculation {
         val result = calculatePostfix(postfixList)
 
         // Check number of digits in result
-        if (calcUtils.hasTooManyDigits(result, 10)) {
+        if (calcUtils.hasTooManyDigits(result, 24)) {
             throw Exception("max digits")
         }
 
@@ -139,64 +132,10 @@ class ScientificCalculation {
         // Replace constants (pi and euler) with their values
         cleanExpression = replaceConstants(cleanExpression)
 
-        // Calculate trig functions, square roots, exponents, absolutes, and factorials
-        cleanExpression = calcSpecialFunctions(cleanExpression)
+        // Calculate factorials
+        cleanExpression = calcFactorial(cleanExpression)
 
         return cleanExpression
-    }
-
-    // Calculate trig functions, square roots, exponents, and factorials
-    private fun calcSpecialFunctions(expression: String): String {
-        var newExpression = expression
-
-        newExpression = calcExponent(newExpression)
-        if (newExpression == "error") { return "error" }
-
-        newExpression = calcAbsValue(newExpression)
-        if (newExpression == "error") { return "error" }
-
-        newExpression = calcSquareRoot(newExpression)
-        if (newExpression == "error") { return "error" }
-
-        newExpression = calcFactorial(newExpression)
-        if (newExpression == "error") { return "error" }
-
-        newExpression = calcTrig(newExpression)
-        if (newExpression == "error") { return "error" }
-
-        return newExpression
-    }
-
-    private fun calcTrig(expression: String): String {
-        if ("sin" !in expression && "cos" !in expression && "tan" !in expression) {
-            return expression
-        }
-
-        var newExpression = expression
-
-        val trigRegex = Regex("""(sin|cos|tan)\(\d+(\.\d+)?\)""")
-        val numberRegex = Regex("""\d+(\.\d+)?""")
-
-        val trigFunctions = trigRegex.findAll(expression)
-        for (trigFunction in trigFunctions) {
-            val trig = trigFunction.value
-            val number = numberRegex.find(trig)?.value?.toDouble()
-
-            if (number == null) { return "error" }
-
-            // Kotlin sin, cos, and tan functions use radians
-            val radians = toRadians(number)
-            val result = when {
-                trig.startsWith("sin") -> sin(radians)
-                trig.startsWith("cos") -> cos(radians)
-                trig.startsWith("tan") -> tan(radians)
-                else -> 0.0
-            }
-
-            val formattedResult = formatShortResult(result.toString())
-            newExpression = newExpression.replace(trig, formattedResult)
-        }
-        return newExpression
     }
 
     private fun factorial(number: Int): Int {
@@ -234,82 +173,6 @@ class ScientificCalculation {
         return newExpression
     }
 
-    private fun calcSquareRoot(expression: String): String {
-        if ("√" !in expression) { return expression }
-
-        var newExpression = expression
-
-        val squareRootRegex = Regex("""√\((\d+(\.\d+)?)\)""")
-        val numberRegex = Regex("""\d+(\.\d+)?""")
-
-        val squareRoots = squareRootRegex.findAll(expression)
-        for (squareRoot in squareRoots) {
-            val squareRootString = squareRoot.value
-            val number = numberRegex.find(squareRootString)?.value?.toDouble()
-
-            if (number == null || number < 0) { return "error" }
-
-            val result = sqrt(number)
-            val formattedResult = formatShortResult(result.toString())
-            newExpression = newExpression.replace(squareRootString, formattedResult)
-        }
-
-        return newExpression
-    }
-
-    private fun calcAbsValue(expression: String): String {
-        if ("|" !in expression) { return expression }
-
-        var newExpression = expression
-        val absRegex = Regex("""\|([^|]+)\|""")
-
-        val absValues = absRegex.findAll(newExpression)
-        for (absValue in absValues) {
-            val abs = absValue.value
-            val content = absValue.groupValues[1]
-
-            try {
-                // Recursively calculate the content inside the absolute value
-                val innerResult = calculateBedmas(content, Context)
-                val number = innerResult.toDouble()
-                val result = abs(number)
-                val formattedResult = formatShortResult(result.toString())
-                newExpression = newExpression.replace(abs, formattedResult)
-            } catch (e: Exception) {
-                // If there's an error calculating the inner expression, return the original expression
-                return expression
-            }
-        }
-
-        // If there are any unclosed absolute value symbols, return the original expression
-        if (newExpression.count { it == '|' } % 2 != 0) {
-            return expression
-        }
-
-        return newExpression
-    }
-
-    private fun calcExponent(expression: String): String {
-        if ("^" !in expression) { return expression }
-
-        var newExpression = expression
-
-        val exponentRegex = Regex("""-?\d+(?:\.\d+)?\^\(\d+\)""")
-        val baseRegex = Regex(""".*(?=\^)""")
-
-        val exponents = exponentRegex.findAll(newExpression)
-        for (exponent in exponents) {
-            val exponentString = exponent.value
-            val base = baseRegex.find(exponentString)?.value?.toDouble()
-            val power = if (exponentString.contains("^(2)")) 2 else 3
-            val result = base?.pow(power).toString()
-            val formattedResult = formatShortResult(result)
-            newExpression = newExpression.replace(exponentString, formattedResult)
-        }
-
-        return newExpression
-    }
-
     // Replaces constants (pi and euler) with their values
     private fun replaceConstants(expression: String): String {
         if ("π" !in expression && "e" !in expression) { return expression }
@@ -328,12 +191,6 @@ class ScientificCalculation {
             if (newExpression in listOf("()", "(-)", "×()")) { return "error" }
             return expression + ")".repeat(missingCount)
         }
-
         return expression
-    }
-
-    private fun formatShortResult(result: String): String {
-        val formattedResult = "%.4f".format(result)
-        return formattedResult
     }
 }
