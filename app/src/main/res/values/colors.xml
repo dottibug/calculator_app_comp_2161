@@ -6,10 +6,11 @@
     <color name="seasalt">#FAFAFA</color>
     <color name="platinum">#E0E0E0</color>
     <color name="poppy">#D13E3E</color>
-    <color name="slateGray">#80909D</color>
+    <color name="slateGray">#BFBFBF</color>
     <color name="steelBlue">#4489BD</color>
     <color name="carolinaBlue">#8BAFCB</color>
     <color name="violet">#AD94C2</color>
+    <color name="cambridge">#9EC9B9</color>
 
     <!-- TODO Pick a color for the operators -->
     <color name="moonstone">#4D9CAE</color>

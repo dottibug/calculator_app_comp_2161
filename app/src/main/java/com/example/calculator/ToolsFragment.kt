@@ -32,10 +32,15 @@ class ToolsFragment : Fragment() {
 
         // Create click listeners
         binding.buttonSettings.setOnClickListener { activity.onSettingsClick(navController) }
-        binding.buttonCalculatorMode.setOnClickListener { activity.onCalculatorModeClick(navController) }
         binding.buttonBackspace.setOnClickListener { onBackspaceClick() }
 
+        binding.buttonCalculatorMode.setOnClickListener {
+            activity.onCalculatorModeClick(navController)
+            updateCalcModeButton()
+        }
+
         setupDarkModeToggle()
+        updateCalcModeButton()
 
         return binding.root
     }
@@ -57,10 +62,20 @@ class ToolsFragment : Fragment() {
     private fun updateDarkModeButton(isDarkMode: Boolean) {
         binding.buttonDarkMode.backgroundTintList = ColorStateList.valueOf(
             if (isDarkMode) {
-                getColor(requireContext(), R.color.violet)
+                getColor(requireContext(), R.color.cambridge)
             } else {
                 getColor(requireContext(), R.color.platinum)
             })
+    }
+
+    private fun updateCalcModeButton() {
+        binding.buttonCalculatorMode.backgroundTintList = ColorStateList.valueOf(
+            if (activity.isScientificMode) {
+                getColor(requireContext(), R.color.cambridge)
+            } else {
+                getColor(requireContext(), R.color.platinum)
+            }
+        )
     }
 
 
@@ -78,5 +93,10 @@ class ToolsFragment : Fragment() {
             val simpleCalculatorFragment = parentFragmentManager.findFragmentById(R.id.simpleCalculatorFragment) as SimpleCalculatorFragment
             simpleCalculatorFragment.onBackspace()
             }
-        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateCalcModeButton()
+    }
 }

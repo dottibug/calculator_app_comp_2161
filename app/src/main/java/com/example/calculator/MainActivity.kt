@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
 import com.example.calculator.databinding.ActivityMainBinding
 
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sharedPreferences: SharedPreferences
     var isScientificMode : Boolean = false
+    private var initialScientificMode: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +31,27 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        setupNavigation() // To Settings Fragment (but also to Simple or Scientific Mode?)
 
         if (savedInstanceState != null) {
             restoreState(savedInstanceState)
         } else {
-            isScientificMode = sharedPreferences.getBoolean("always_scientific", false)
+            // Set the initial mode based on user preference
+            initialScientificMode = sharedPreferences.getBoolean("default_scientific_mode", false)
+            // Set the current mode to the initial mode
+            isScientificMode = initialScientificMode
         }
+
+        // Set up the NavController
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerNavigation) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // Set the start destination based on the default mode
+//        val defaultIsScientific = sharedPreferences.getBoolean("default_scientific_mode", false)
+        val navGraph = navController.navInflater.inflate(R.navigation.navigation)
+        navGraph.setStartDestination(
+            if (initialScientificMode) R.id.scientificModeFragment else R.id.simpleModeFragment
+        )
+        navController.graph = navGraph
 
         // Sets up the window insets so app content is not covered by system UI
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
@@ -49,11 +65,13 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean("isScientificMode", isScientificMode)
+        outState.putBoolean("initialScientificMode", initialScientificMode)
     }
 
     // Restore state on screen rotation
     private fun restoreState(savedInstanceState: Bundle) {
         isScientificMode = savedInstanceState.getBoolean("isScientificMode")
+        initialScientificMode = savedInstanceState.getBoolean("initialScientificMode")
     }
 
     // Apply night mode based on user preference

@@ -14,7 +14,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         setupNightModePreference()
         setupDecimalPlacesPreference()
-
+        setupDefaultCalcModePreference()
     }
 
     private fun setupNightModePreference() {
@@ -54,6 +54,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+    }
+
+    private fun setupDefaultCalcModePreference() {
+        val defaultCalcModePreference = findPreference<SwitchPreferenceCompat>("default_scientific_mode")
+
+        defaultCalcModePreference?.setOnPreferenceChangeListener { _, newValue ->
+            val isScientificDefault = newValue as Boolean
+            true
         }
     }
 }

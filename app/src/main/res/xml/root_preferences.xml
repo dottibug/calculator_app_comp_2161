@@ -16,7 +16,7 @@
             app:defaultValue="10" />
 
         <SwitchPreferenceCompat
-            app:key="always_scientific"
+            app:key="default_scientific_mode"
             app:title="Always Launch Scientific"
             app:summary="Launch the app in scientific mode" />
 

@@ -11,6 +11,7 @@
         <item name="colorButtonNormal">@color/platinum</item>
 
         <item name="colorTertiary">@color/slateGray</item>
+        <item name="colorOnTertiary">@color/jet</item>
 
         <item name="android:colorBackground">@color/seasalt</item>
         <item name="colorOnBackground">@color/jet</item>

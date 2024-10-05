@@ -1,6 +1,7 @@
 package com.example.calculator
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -12,6 +13,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.example.calculator.databinding.FragmentDisplayBinding
 
 // Fragment to display the running equation and result of the calculation
@@ -20,6 +22,7 @@ class DisplayFragment : Fragment() {
     private lateinit var expressionInput: EditText
     private lateinit var resultView: TextView
     private lateinit var imm: InputMethodManager
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View {
@@ -31,6 +34,8 @@ class DisplayFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         expressionInput = binding.editViewExpression
         resultView = binding.textViewResult
@@ -77,7 +82,7 @@ class DisplayFragment : Fragment() {
         for (i in equation.indices) {
             if (equation[i] in operators) {
                 if (equation[i] in operators) {
-                    val colorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.aero))
+                    val colorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.carolinaBlue))
                     spannable.setSpan(colorSpan, i, i + 1, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
             }
@@ -87,9 +92,17 @@ class DisplayFragment : Fragment() {
 
     // Color final result
     private fun colorFinalResult(result: String, context: Context): SpannableString {
+        val isDarkMode = sharedPreferences.getBoolean("dark_mode", false)
+
         val spannable = SpannableString(result)
-        val colorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.jet))
-        spannable.setSpan(colorSpan, 0, result.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+        if (isDarkMode) {
+            val colorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.carolinaBlue))
+            spannable.setSpan(colorSpan, 0, result.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else {
+            val colorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.steelBlue))
+            spannable.setSpan(colorSpan, 0, result.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
         return spannable
     }
 }
