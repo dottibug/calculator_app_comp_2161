@@ -37,12 +37,30 @@ class ToolsFragment : Fragment() {
         binding.buttonCalculatorMode.setOnClickListener {
             activity.onCalculatorModeClick(navController)
             updateCalcModeButton()
+
+            // Clear state when switching modes.
+            // Each mode uses a different calculation method (simple left-to-right vs scientific
+            // bedmas). State needs to be cleared to ensure the correct calculation and result is
+            // displayed according to the calculator mode.
+            clearCalcState()
+
+//            activity.expression = ""
+//            activity.result = ""
         }
 
         setupDarkModeToggle()
         updateCalcModeButton()
 
         return binding.root
+    }
+
+    private fun clearCalcState() {
+        val currentCalcFragment = parentFragmentManager.primaryNavigationFragment
+        if (currentCalcFragment is Calculator) {
+            activity.expression = ""
+            activity.result = ""
+            activity.memory = ""
+        }
     }
 
     private fun setupDarkModeToggle() {

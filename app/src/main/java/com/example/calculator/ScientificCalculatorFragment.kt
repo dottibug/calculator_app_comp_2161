@@ -23,6 +23,10 @@ class ScientificCalculatorFragment : Calculator() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         display = parentFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
+
+        if (savedInstanceState != null) {
+            updateDisplay()
+        }
     }
 
     override fun getMode(): String {

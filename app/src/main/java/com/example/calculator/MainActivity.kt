@@ -20,6 +20,10 @@ class MainActivity : AppCompatActivity() {
     var isScientificMode : Boolean = false
     private var initialScientificMode: Boolean = false
 
+    var expression: String = ""
+    var result: String = ""
+    var memory: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Base_Theme_Calculator)

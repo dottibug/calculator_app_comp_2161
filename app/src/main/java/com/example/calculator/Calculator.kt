@@ -11,9 +11,9 @@ import androidx.preference.PreferenceManager
 // MemoryCallback interface to handle communication
 abstract class Calculator : Fragment() {
     protected lateinit var display: DisplayFragment
-    protected var isFinalResult: Boolean = false
-    protected var expression: String = ""
-    protected var result: String = ""
+    var isFinalResult: Boolean = false
+    var expression: String = ""
+    var result: String = ""
     protected var memory: String = ""
     protected var decimalPlaces: Int = 10
     protected val memoryManager = Memory()
@@ -23,7 +23,6 @@ abstract class Calculator : Fragment() {
     protected val simpleCalc = SimpleCalculation()
     protected val scientificCalc = ScientificCalculation()
     protected lateinit var sharedPreferences: SharedPreferences
-
 
     // Calculate result of an expression based on calculator mode. Simple mode calculates from
     // left to right (ignoring BEDMAS order of operations), while scientific mode uses BEDMAS.
@@ -73,6 +72,11 @@ abstract class Calculator : Fragment() {
     private fun displayResult() {
         if (isFinalResult) display.renderFinalResult(result)
         else display.renderResult(result)
+    }
+
+    fun updateDisplay() {
+        display.renderExpression(expression, expression.length, 0)
+        display.renderResult(result)
     }
 
     // Render the expression and calculated result in the display fragment
@@ -298,14 +302,18 @@ abstract class Calculator : Fragment() {
         outState.putString("expression", expression)
         outState.putString("result", result)
         outState.putString("memory", memory)
+        outState.putBoolean("isFinalResult", isFinalResult)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
+
         if (savedInstanceState != null) {
             expression = savedInstanceState.getString("expression", "")
             result = savedInstanceState.getString("result", "")
             memory = savedInstanceState.getString("memory", "")
+            isFinalResult = savedInstanceState.getBoolean("isFinalResult", false)
+            updateDisplay()
         }
     }
 

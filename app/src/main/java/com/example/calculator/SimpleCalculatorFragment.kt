@@ -6,9 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.calculator.databinding.FragmentSimpleCalculatorBinding
 
-// TODO GET DECIMAL PLACES FROM USER SETTINGS WHEN IMPLEMENTED (pass to calculateLeftToRight
-//  functions)
-
 // NOTE: The simple calculator calculates the result of an equation sequentially, from left to
 //  right, ignoring BEDMAS order of operations
 class SimpleCalculatorFragment : Calculator() {
@@ -26,6 +23,10 @@ class SimpleCalculatorFragment : Calculator() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         display = parentFragmentManager.findFragmentById(R.id.displayFragment) as DisplayFragment
+
+        if (savedInstanceState != null) {
+            updateDisplay()
+        }
     }
 
     override fun getMode(): String {
