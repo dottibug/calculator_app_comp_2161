@@ -10,18 +10,18 @@ class ScientificCalculation {
     private val eulerValue = "2.7182"
     private val calcUtils = CalcUtils()
 
-    fun calculateBedmas(expression: String, context: Context): String {
+    fun calculateBedmas(expression: String, context: Context, decimalPlaces: Int): String {
 
         val cleanExpression = cleanExpression(expression)
         val postfixList = getPostfixList(cleanExpression, context)
         val result = calculatePostfix(postfixList)
 
         // Check number of digits in result
-        if (calcUtils.hasTooManyDigits(result, 24)) {
+        if (calcUtils.hasTooManyDigits(result, 12, decimalPlaces)) {
             throw Exception("max digits")
         }
 
-        return calcUtils.formatResult(result, 10)
+        return calcUtils.formatResult(result, decimalPlaces)
 
     }
 

@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         // Set the start destination based on the default mode
-//        val defaultIsScientific = sharedPreferences.getBoolean("default_scientific_mode", false)
         val navGraph = navController.navInflater.inflate(R.navigation.navigation)
         navGraph.setStartDestination(
             if (initialScientificMode) R.id.scientificModeFragment else R.id.simpleModeFragment

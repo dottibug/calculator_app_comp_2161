@@ -1,13 +1,11 @@
 package com.example.calculator
 
-import android.content.Context
-
 // This class contains the logic for the simple calculator
 // It calculates the result of the equation sequentially, from left to right, ignoring BEDMAS order of operations
 class SimpleCalculation {
     private val calcUtils = CalcUtils()
 
-    fun calculateLeftToRight(expression: String, context: Context): String {
+    fun calculateLeftToRight(expression: String, decimalPlaces: Int): String {
         if (expression.isEmpty()) return ""
 
         val operators = setOf('+', '~', '×', '÷', '-')
@@ -47,11 +45,11 @@ class SimpleCalculation {
         }
 
         // Check number of digits in result
-        if (calcUtils.hasTooManyDigits(result.toString(), 24)) {
+        if (calcUtils.hasTooManyDigits(result.toString(), 12, decimalPlaces)) {
             throw Exception("max digits")
         }
 
-        return calcUtils.formatResult(result.toString(), 10)
+        return calcUtils.formatResult(result.toString(), decimalPlaces)
     }
 
     private fun performOperation(result: Double, number: Double, operator: Char): Double {

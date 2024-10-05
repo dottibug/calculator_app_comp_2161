@@ -39,10 +39,10 @@ abstract class Calculator : Fragment() {
         try {
             when (mode) {
             "simple" -> result = if (exp == "-") { "" }
-                        else { simpleCalc.calculateLeftToRight(exp, context) }
+                        else { simpleCalc.calculateLeftToRight(exp, context, decimalPlaces) }
 
             "scientific" -> result = if (exp in setOf("(-", "abs((-", "(")) { "" }
-                            else { scientificCalc.calculateBedmas(exp, context) }
+                            else { scientificCalc.calculateBedmas(exp, context, decimalPlaces) }
 
                 else -> throw Exception("invalid mode")
             }

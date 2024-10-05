@@ -16,24 +16,11 @@ class CalcUtils {
             .trimEnd('.')
     }
 
-    fun hasTooManyDigits(number: String, maxDigits: Int): Boolean {
-        // Trim leading and trailing zeros
-        val trimNum = number.trimStart('0').trimEnd('0')
-
-        // Split by "." to get the integer and decimal parts
-        val parts = trimNum.split(".")
-        val integers = parts[0]
-        val decimals = parts.getOrNull(1) ?: "" // null if no decimal in number
-
-        // Count the digits in the integer and decimal parts
-        val intDigits = integers.length
-        val decDigits = decimals.length
-
-        // Add up the total digits
-        val totalDigits = intDigits + decDigits
-
-        // If the total digits is greater than the max digits, return true
-        return totalDigits > maxDigits
+    fun hasTooManyDigits(number: String, maxDigits: Int, decimalPlaces: Int): Boolean {
+       // Format result to the number of decimal places then count the digits
+        val formattedNumber = formatResult(number, decimalPlaces)
+        val digitCount = formattedNumber.count { it.isDigit() }
+        return digitCount > maxDigits
     }
 
     private fun removeBrackets(input: String): String {
