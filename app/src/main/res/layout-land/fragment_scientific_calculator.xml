@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/colorBackground"
+        android:paddingLeft="18dp"
+        android:paddingTop="8dp"
+        android:paddingRight="18dp"
+        android:paddingBottom="12dp"
+        tools:context=".NumberPadFragment">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/col1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="2dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/buttonPi"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:height="52dp"
+                    android:backgroundTint="?attr/colorTertiary"
+                    android:text="@string/pi"
+                    android:textColor="?attr/colorOnTertiary"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/buttonClear"
+                    style="@style/scientificClearButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/clear"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button7"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n7"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button4"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n4"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button1"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n1"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/buttonSign"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/sign"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/col2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/buttonEuler"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:height="52dp"
+                    android:backgroundTint="?attr/colorTertiary"
+                    android:text="@string/euler"
+                    android:textColor="?attr/colorOnTertiary"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/buttonBracketOpen"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/bracketOpen"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button8"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n8"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button5"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n5"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button2"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n2"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button0"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n0"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/col3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/buttonFactorial"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:height="52dp"
+                    android:backgroundTint="?attr/colorTertiary"
+                    android:text="@string/factorial"
+                    android:textColor="?attr/colorOnTertiary"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/buttonBracketClose"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/bracketClose"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button9"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n9"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button6"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n6"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/button3"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/n3"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/buttonDecimal"
+                    style="@style/scientificButton"
+                    android:layout_width="match_parent"
+                    android:height="52dp"
+                    android:text="@string/decimal"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/col4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/buttonDivide"
+                    style="@style/scientificOperator"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:height="52dp"
+                    android:gravity="center|center_horizontal|center_vertical"
+                    android:includeFontPadding="false"
+                    android:text="@string/divide"
+                    android:textSize="28sp" />
+
+                <Button
+                    android:id="@+id/buttonMultiply"
+                    style="@style/scientificOperator"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:height="52dp"
+                    android:includeFontPadding="false"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/multiply"
+                    android:textSize="28sp" />
+
+                <Button
+                    android:id="@+id/buttonAdd"
+                    style="@style/scientificOperator"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:height="52dp"
+                    android:includeFontPadding="false"
+                    android:text="@string/add"
+                    android:textSize="28sp" />
+
+                <Button
+                    android:id="@+id/buttonSubtract"
+                    style="@style/scientificOperator"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:height="52dp"
+                    android:includeFontPadding="false"
+                    android:text="@string/subtract"
+                    android:textSize="28sp" />
+
+                <Button
+                    android:id="@+id/buttonEqual"
+                    style="@style/scientificEquals"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:width="60dp"
+                    android:height="52dp"
+                    android:includeFontPadding="false"
+                    android:text="@string/equals"
+                    android:textSize="28sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
